@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "cezappui",
+    "version": "1.0.0",
+    "slug": "cezappui",
+    "facebookScheme": "fb559657841057861",
+    "sdkVersion": "21.0.0",
+    "ios": {
+      "bundleIdentifier": "com.davon.cezappui"
+    },
+    "android": {
+      "package": "com.davon.cezappui"
+    }
+  }
+}
