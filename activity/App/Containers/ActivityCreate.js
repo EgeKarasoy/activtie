@@ -55,15 +55,17 @@ type ActivityCreatePropType = {
   activityNameChange: Function,
   activityDescription: ?string,
   activityDescriptionChange: Function,
-  peopleCount: ?number,
-  peopleCountChange: Function,
+  userNumber: ?number,
+  userNumberChange: Function,
   date: ?string,
   dateChange: Function,
   createActivityButton: Function,
   time: ?string,
   timeChange: Function,
   categoryPickerValue: ?string,
-  categoryPickerValueChange: Function
+  categoryPickerValueChange: Function,
+  cityNameChange: Function,
+  cityName: ?string
 };
 
 class ActivityCreate extends Component<ActivityCreatePropType> {
@@ -108,8 +110,8 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
               <Input
                 placeholder="5"
                 autoCorrect={false}
-                onChangeText={this.props.peopleCountChange}
-                value={this.props.peopleCount}
+                onChangeText={this.props.userNumberChange}
+                value={this.props.userNumber}
                 maxLength={2}
               />
             </FormGroup>
@@ -121,8 +123,8 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
                 name="cities"
                 options={cityOptions}
                 placeholder="Izmir"
-                onChangeText={this.props.peopleCountChange}
-                value={this.props.peopleCount} 
+                onChangeText={this.props.cityNameChange}
+                value={this.props.cityName}
                 />
             </FormGroup>
             <FormGroup>

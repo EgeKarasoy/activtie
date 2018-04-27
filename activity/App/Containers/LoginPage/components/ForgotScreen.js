@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
-import Dimensions from 'Dimensions';
 import {
   StyleSheet,
   KeyboardAvoidingView,
   Text,
+  Dimensions,
   // TouchableOpacity,
   // Image,
 } from 'react-native';
@@ -21,11 +21,9 @@ import usernameImg from '../images/username.png';
 import passwordImg from '../images/password.png';
 // import eyeImg from '../images/eye_black.png';
 
-type LoginFormPropType = {
-  username: ?string,
-  usernameChange: Function,
-  password: ?string,
-  passwordChange: Function,
+type ForgotScreenPropType = {
+  forgotUsername: ?string,
+  forgotUsernameChange: Function,
   error: ?string
   // name: ?string,
   // nameChange: Function
@@ -53,7 +51,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export class ForgotScreen extends Component<LoginFormPropType> {
+export class ForgotScreen extends Component<ForgotScreenPropType> {
   // constructor(props: LoginFormPropType) {
   //   super(props);
   //   this.state = {
@@ -89,8 +87,8 @@ export class ForgotScreen extends Component<LoginFormPropType> {
           autoCapitalize="none"
           returnKeyType="done"
           autoCorrect={false}
-          onChangeText={this.props.usernameChange}
-          value={this.props.username}
+          onChangeText={this.props.forgotUsernameChange}
+          value={this.props.forgotUsername}
         />
         {/* <UserInput
           source={passwordImg}
@@ -120,14 +118,14 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   //   console.log(name);
   //   dispatch(LoginActionCreators.nameChange(name));
   // },
-  usernameChange: (text: ?string) => {
+  forgotUsernameChange: (text: ?string) => {
     console.log(text);
-    dispatch(LoginActionCreators.usernameChange(text));
+    dispatch(LoginActionCreators.forgotUsernameChange(text));
   },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
-  username: state.login.username,
+  forgotUsername: state.login.forgotUsername,
   // name: state.login.name,
   error: state.login.error,
 });

@@ -34,32 +34,35 @@ const styles = StyleSheet.create({
 });
 
 type AllCitiesPropType = {
-  goAllCitiesCompletedButton: Function
+  goAllCitiesCompletedButton: Function,
+  getCityData: Function,
+  cityData: Array< mixed >
 };
 
 class AllCities extends Component<AllCitiesPropType> {
-  constructor() {
-    super();
-    this.state = {
-      data: [],
-    };
-  }
+  // constructor() {
+  //   super();
+  //   this.state = {
+  //     data: [],
+  //   };
+  // }
 
   componentDidMount() {
-    this.getData();
+    const cities = this.props.getCityData
+    cities();
     // console.disableYellowBox = true;
   }
 
-  getData(): void {
-    return fetch('https://univerlist.com/api/v1/province/', { method: 'GET' })
-      .then((response: any): any => response.json())
-      .then((responseJson: any) => {
-        this.setState({ data: responseJson.results });
-      })
-      .catch((error: any) => {
-        console.error(error);
-      });
-  }
+  // getData(): void {
+  //   return fetch('https://univerlist.com/api/v1/province/', { method: 'GET' })
+  //     .then((response: any): any => response.json())
+  //     .then((responseJson: any) => {
+  //       this.setState({ data: responseJson.results });
+  //     })
+  //     .catch((error: any) => {
+  //       console.error(error);
+  //     });
+  // }
 
   //   postData() {
   //     return fetch('http://localhost:1923/api/cities', {
@@ -78,6 +81,21 @@ class AllCities extends Component<AllCitiesPropType> {
 
   render(): React$Element< * > {
     if (this.props.isGoAllCities === false) return <ActivityMain />;
+    if (this.props.isLoading) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ fontWeight: 'bold', color: 'black' }}>
+            Yukleniyor Lutfen Bekleyin...
+          </Text>
+        </View>
+      );
+    }
     return (
       <Container>
         <Header>
@@ -90,7 +108,7 @@ class AllCities extends Component<AllCitiesPropType> {
         <Content contentContainerStyle={styles.container}>
           <FlatList
             numColumns={3}
-            data={this.state.data}
+            data={this.props.cityData}
             keyExtractor={(x: any, i: any): any => i}
             renderItem={({ item }: any): React$Element< * > => (
               <Item
@@ -99,7 +117,7 @@ class AllCities extends Component<AllCitiesPropType> {
                 }}
               >
                 <Image
-                  source={{ uri: `${item.thumbnail}` }}
+                  source={{ uri: `${item.city_picture}` }}
                   style={{ height: 150, width: 100 }}
                 >
                   <View
@@ -110,7 +128,7 @@ class AllCities extends Component<AllCitiesPropType> {
                     }}
                   >
                     <Button small full dark>
-                      <Text style={{ color: 'white' }}>{`${item.name}`}</Text>
+                      <Text style={{ color: 'white' }}>{`${item.city_name}`}</Text>
                     </Button>
                   </View>
                 </Image>
@@ -127,10 +145,24 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   goAllCitiesCompletedButton: () => {
     dispatch(ActivityActionCreators.goAllCitiesCompleted());
   },
+  getCityData: () => {
+    // dispatch started fetch action
+    fetch('http://activtie.com/api/all_cities', { method: 'GET' })
+      .then((response: any): any => response.json())
+      .then((responseJson: any) => {
+        dispatch(ActivityActionCreators.loadingCompleted());
+        dispatch(ActivityActionCreators.getCityData(responseJson));
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
   isGoAllCities: state.activity.isGoAllCities,
+  isLoading: state.activity.isLoading,
+  cityData: state.activity.cityData,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AllCities);

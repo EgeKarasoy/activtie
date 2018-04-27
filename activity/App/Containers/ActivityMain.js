@@ -8,8 +8,9 @@ import {
   StyleSheet,
   Platform,
   Image,
+  FlatList,
 } from 'react-native';
-import { Content, Button, Left, Right, CardItem, Thumbnail, Body, Icon } from 'native-base';
+import { Content, Button, Left, Right, CardItem, Thumbnail, Body, Icon, Card } from 'native-base';
 import Slideshow from 'react-native-slideshow';
 import Category from 'react-native-category';
 import { connect } from 'react-redux';
@@ -21,6 +22,7 @@ import ActivityActionCreators from '../Redux/ActivityRedux';
 import ActivityHeader from './ActivityHeader';
 import IndexCard from './Profile/IndexCard';
 import AllCities from './AllCities'
+import ActivityJoin from './ActivityJoin'
 
 const styles = StyleSheet.create({
   header: {
@@ -65,7 +67,10 @@ const styles = StyleSheet.create({
 
 type ActivityMainPropType = {
   goProfileCardButton: Function,
-  goAllCitiesButton: Function
+  goAllCitiesButton: Function,
+  getLatestActivityData: Function,
+  latestActivityData: Array< mixed >,
+  goActivityJoinButton: Function
 };
 
 class ActivityMain extends Component<ActivityMainPropType> {
@@ -117,6 +122,12 @@ class ActivityMain extends Component<ActivityMainPropType> {
     });
   }
 
+  componentDidMount() {
+    const latestActivities = this.props.getLatestActivityData
+    latestActivities();
+    // console.disableYellowBox = true;
+  }
+
   componentWillUnmount() {
     clearInterval(this.state.interval);
   }
@@ -132,7 +143,7 @@ class ActivityMain extends Component<ActivityMainPropType> {
   render(): React$Element< * > {
     if (this.props.isGoProfileCard) return <IndexCard />;
     if (this.props.isGoAllCities) return <AllCities />;
-    
+    if (this.props.isGoActivityJoin) return <ActivityJoin />;
     return (
       <Content>
         <ActivityHeader />
@@ -225,144 +236,77 @@ class ActivityMain extends Component<ActivityMainPropType> {
               </View>
             </Image>
           </View>
-          <Text style={{ fontWeight: 'bold' }}>    Sana Özel Aktiviteler</Text>
+          <Text style={{ fontWeight: 'bold' }}>    En Son Aktiviteler</Text>
           <CardItem>
-            <Left>
-              <Thumbnail source={require('../Images/egekrsy.jpg')} />
-              <Body>
-                <Text>Duman Bahar Konseri</Text>
-                <Text note style={{ fontStyle: 'italic' }}>
-                    Beraber gidecegim arkadaş arıyorum
-                </Text>
-                <Button
-                  transparent
-                  dark
-                  onPress={this.props.goProfileCardButton}
-                >
-                  <Text style={{ fontWeight: 'bold', color: 'blue' }}>
-                      Ege Karasoy
-                  </Text>
-                </Button>
-              </Body>
-            </Left>
-          </CardItem>
-          <CardItem cardBody>
-            <Image
-              source={require('../Images/concert.jpg')}
-              style={{ height: 200, width: null, flex: 1 }}
+            <FlatList
+              // numColumns={3}
+              data={this.props.latestActivityData}
+              keyExtractor={(x: any, i: any): any => i}
+              renderItem={({ item }: any): React$Element< * > => (
+                <Card>
+                  <CardItem>
+                    <Left>
+                      <Thumbnail source={require('../Images/activtielogo.jpeg')} />
+                      <Body>
+                        <Text>{`${item.activity_name}`}</Text>
+                        <Text note style={{ fontStyle: 'italic' }}>
+                            Kategori: {`${item.category_name}`}
+                        </Text>
+                        {/* <Button
+                          transparent
+                          dark
+                          onPress={this.props.goProfileCardButton}
+                        >
+                          <Text style={{ fontWeight: 'bold', color: 'blue' }}>
+                              Ege Karasoy
+                          </Text>
+                        </Button> */}
+                      </Body>
+                    </Left>
+                  </CardItem>
+                  <CardItem cardBody>
+                    <Image
+                      source={{ uri: `data:image/jpg;base64,${item.activity_picture}` }}
+                      style={{ height: 200, width: null, flex: 1 }}
+                    >
+                      <Image
+                        source={{ uri: `${item.activity_picture}` }}
+                        style={{ height: 200, width: null, flex: 1 }}
+                      />
+                    </Image>
+                  </CardItem>
+                  <Button full warning onPress={(): void => this.props.goActivityJoinButton(item.activity_id)}>
+                    <Text> INCELE ! </Text>
+                  </Button>
+                  <CardItem>
+                    <Left>
+                      <Text>
+                        <Icon active name="pin" /> {`${item.activity_city}            `}
+                        <Text>
+                          <Icon active name="people" /> {`${item.user_number}            `}
+                          <Text>
+                            <Icon active name="time" /> {`${item.creation_time}`}
+                          </Text>
+                        </Text>
+                      </Text>
+                    </Left>
+                    {/* <Body>
+                      <Text>
+                        <Icon active name="people" /> {`${item.user_number}   `}
+                        <Text>
+                          <Icon active name="time" /> {`${item.creation_time}`}
+                        </Text>
+                      </Text>
+                    </Body> */}
+                    {/* <Right>
+                      <Text>
+                        <Icon active name="time" /> {`${item.creation_time}`}
+                      </Text>
+                    </Right> */}
+                  </CardItem>
+                </Card>
+              )}
             />
-          </CardItem>
-          <Button full warning>
-            <Text> KATIL !</Text>
-          </Button>
-          <CardItem>
-            <Left>
-              <Text>
-                <Icon active name="pin" /> Izmir
-              </Text>
-            </Left>
-            <Body>
-              <Text>
-                <Icon active name="people" /> 4 Kisi
-              </Text>
-            </Body>
-            <Right>
-              <Text>
-                <Icon active name="time" /> 19:00
-              </Text>
-            </Right>
-          </CardItem>
-          <CardItem>
-            <Left>
-              <Thumbnail source={require('../Images/egekrsy.jpg')} />
-              <Body>
-                <Text>Duman Bahar Konseri</Text>
-                <Text note style={{ fontStyle: 'italic' }}>
-                    Beraber gidecegim arkadaş arıyorum
-                </Text>
-                <Button
-                  transparent
-                  dark
-                  onPress={this.props.goProfileCardButton}
-                >
-                  <Text style={{ fontWeight: 'bold', color: 'blue' }}>
-                      Ege Karasoy
-                  </Text>
-                </Button>
-              </Body>
-            </Left>
-          </CardItem>
-          <CardItem cardBody>
-            <Image
-              source={require('../Images/concert.jpg')}
-              style={{ height: 200, width: null, flex: 1 }}
-            />
-          </CardItem>
-          <Button full warning>
-            <Text> KATIL !</Text>
-          </Button>
-          <CardItem>
-            <Left>
-              <Text>
-                <Icon active name="pin" /> Izmir
-              </Text>
-            </Left>
-            <Body>
-              <Text>
-                <Icon active name="people" /> 4 Kisi
-              </Text>
-            </Body>
-            <Right>
-              <Text>
-                <Icon active name="time" /> 19:00
-              </Text>
-            </Right>
-          </CardItem>
-          <CardItem>
-            <Left>
-              <Thumbnail source={require('../Images/egekrsy.jpg')} />
-              <Body>
-                <Text>Duman Bahar Konseri</Text>
-                <Text note style={{ fontStyle: 'italic' }}>
-                    Beraber gidecegim arkadaş arıyorum
-                </Text>
-                <Button
-                  transparent
-                  dark
-                  onPress={this.props.goProfileCardButton}
-                >
-                  <Text style={{ fontWeight: 'bold', color: 'blue' }}>
-                      Ege Karasoy
-                  </Text>
-                </Button>
-              </Body>
-            </Left>
-          </CardItem>
-          <CardItem cardBody>
-            <Image
-              source={require('../Images/concert.jpg')}
-              style={{ height: 200, width: null, flex: 1 }}
-            />
-          </CardItem>
-          <Button full warning>
-            <Text> KATIL !</Text>
-          </Button>
-          <CardItem>
-            <Left>
-              <Text>
-                <Icon active name="pin" /> Izmir
-              </Text>
-            </Left>
-            <Body>
-              <Text>
-                <Icon active name="people" /> 4 Kisi
-              </Text>
-            </Body>
-            <Right>
-              <Text>
-                <Icon active name="time" /> 19:00
-              </Text>
-            </Right>
           </CardItem>
         </View>
       </Content>
@@ -377,11 +321,28 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   goAllCitiesButton: () => {
     dispatch(ActivityActionCreators.goAllCities());
   },
+  goActivityJoinButton: (value: Object) => {
+    dispatch(ActivityActionCreators.goActivityJoin(value));
+  },
+  getLatestActivityData: () => {
+    // dispatch started fetch action
+    fetch('http://activtie.com/api/activities/%7B%22keyword%22:%22latest%22%7D', { method: 'GET' })
+      .then((response: any): any => response.json())
+      .then((responseJson: any) => {
+        dispatch(ActivityActionCreators.getLatestActivityData(responseJson));
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
   isGoProfileCard: state.profile.isGoProfileCard,
   isGoAllCities: state.activity.isGoAllCities,
+  isGoActivityJoin: state.activity.isGoActivityJoin,
+  latestActivityData: state.activity.latestActivityData,
+  activityId: state.activity.activityId,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityMain);

@@ -26,9 +26,11 @@ type LoginFormPropType = {
   usernameChange: Function,
   password: ?string,
   passwordChange: Function,
-  error: ?string
-  // name: ?string,
-  // nameChange: Function
+  error: ?string,
+  name: ?string,
+  nameChange: Function,
+  surname: ?string,
+  surnameChange: Function
 };
 
 // type LoginFormStateType = {
@@ -53,7 +55,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export class RegisterScreen extends Component<LoginFormPropType> {
+class RegisterScreen extends Component<LoginFormPropType> {
   // constructor(props: LoginFormPropType) {
   //   super(props);
   //   this.state = {
@@ -72,16 +74,26 @@ export class RegisterScreen extends Component<LoginFormPropType> {
   render(): ?React$Element< * > {
     return (
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        {/* <UserInput
+        <UserInput
           source={usernameImg}
           secureTextEntry={false}
-          placeholder=" Username"
+          placeholder=" Name"
           autoCapitalize="none"
           returnKeyType="done"
           autoCorrect={false}
           onChangeText={this.props.nameChange}
           value={this.props.name}
-        /> */}
+        />
+        <UserInput
+          source={usernameImg}
+          secureTextEntry={false}
+          placeholder=" Surname"
+          autoCapitalize="none"
+          returnKeyType="done"
+          autoCorrect={false}
+          onChangeText={this.props.surnameChange}
+          value={this.props.surname}
+        />
         <UserInput
           source={usernameImg}
           secureTextEntry={false}
@@ -89,6 +101,7 @@ export class RegisterScreen extends Component<LoginFormPropType> {
           autoCapitalize="none"
           returnKeyType="done"
           autoCorrect={false}
+          uppercase={false}
           onChangeText={this.props.usernameChange}
           value={this.props.username}
         />
@@ -125,14 +138,18 @@ export class RegisterScreen extends Component<LoginFormPropType> {
   }
 }
 
-const DEVICE_WIDTH = Dimensions.get('window').width;
-const DEVICE_HEIGHT = Dimensions.get('window').height;
+// const DEVICE_WIDTH = Dimensions.get('window').width;
+// const DEVICE_HEIGHT = Dimensions.get('window').height;
 
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
-  // nameChange: (name: ?string) => {
-  //   console.log(name);
-  //   dispatch(LoginActionCreators.nameChange(name));
-  // },
+  nameChange: (name: ?string) => {
+    console.log(name);
+    dispatch(LoginActionCreators.nameChange(name));
+  },
+  surnameChange: (surname: ?string) => {
+    console.log(surname);
+    dispatch(LoginActionCreators.surnameChange(surname));
+  },
   usernameChange: (text: ?string) => {
     console.log(text);
     dispatch(LoginActionCreators.usernameChange(text));
@@ -145,7 +162,8 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
   username: state.login.username,
-  // name: state.login.name,
+  name: state.login.name,
+  surname: state.login.surname,
   password: state.login.password,
   error: state.login.error,
 });

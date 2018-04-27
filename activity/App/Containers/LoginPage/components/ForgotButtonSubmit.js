@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
-import Dimensions from 'Dimensions';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -11,9 +10,10 @@ import {
   Animated,
   Image,
   View,
+  Dimensions,
+  Alert,
 } from 'react-native';
 import { connect } from 'react-redux';
-import firebase from 'firebase';
 import type { StateType } from '../../../Redux/index';
 import LoginActions from '../../../Redux/LoginRedux';
 import spinner from '../images/loading.gif';
@@ -66,13 +66,14 @@ type ForgotButtonSubmitPropType = {
   // password: ?string,
   buttonPress: Function,
   // facebookData: ?string
-  forgotPasswordComplated: Function
+  forgotPasswordComplated: Function,
+  forgotUsername: ?string,
+  usernameErrorChange: Function,
+  usernameError: ?string
 };
 
 type ForgotButtonSubmitStateType = {
-  isLoading: boolean,
-  username: ?string,
-  isForgot: boolean
+  isLoading: boolean
   // backButton: boolean
   // json: any
 };
@@ -86,14 +87,58 @@ export class ForgotButtonSubmit extends Component<
 
     this.state = {
       isLoading: false,
-      username: '',
-      isForgot: false,
     };
 
     //    this.buttonAnimated = new Animated.Value(0);
     //    this.growAnimated = new Animated.Value(0);
     // this._onPress = this._onPress.bind(this);
   }
+
+  onPressButton = () => {
+    const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(this.props.forgotUsername) === false) {
+      const usernameError2 = this.props.usernameErrorChange;
+      usernameError2('Gecerli bir email girin..');
+    } else {
+      const passwordError2 = this.props.usernameErrorChange;
+      passwordError2('');
+      this.buttonPress();
+    }
+  };
+
+  buttonPress = () => {
+    fetch('http://activtie.com/api/new_password', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_e_mail: this.props.forgotUsername,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then(() => {
+        Alert.alert(
+          'İşlem Başarılı !',
+          'Şifreniz Mail Adresinize Gönderilmiştir',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+        const forgotDone = this.props.forgotPasswordComplated;
+        forgotDone();
+
+        // dispatch(LoginActions.registerComplated());
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  };
 
   render(): ?React$Element< * > {
     // const changeWidth = this.buttonAnimated.interpolate({
@@ -118,15 +163,16 @@ export class ForgotButtonSubmit extends Component<
         >
           <TouchableOpacity
             style={styles.button}
-            onPress={this.props.buttonPress}
+            onPress={this.onPressButton}
             activeOpacity={1}
           >
             {this.state.isLoading ? (
               <Image source={spinner} style={styles.image} />
             ) : (
-              <Text style={styles.text}>SEND PASSWORD</Text>
+              <Text style={styles.text}>SIFRE GONDER</Text>
             )}
           </TouchableOpacity>
+          <Text style={{ color: 'red', fontWeight: 'bold' }}>{this.props.usernameError}</Text>
           {/* <TouchableOpacity
             style={styles.button}
             onPress={this.onRegister}
@@ -146,14 +192,18 @@ export class ForgotButtonSubmit extends Component<
 }
 
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
+  usernameErrorChange: (value: Object) => {
+    dispatch(LoginActions.usernameErrorChange(value));
+  },
   buttonPress: (): void => dispatch(LoginActions.loginRequest()),
-  forgotComplated: () => {
-    dispatch(LoginActions.forgotComplated());
+  forgotPasswordComplated: () => {
+    dispatch(LoginActions.forgotPasswordComplated());
   },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
-  username: state.login.username,
+  forgotUsername: state.login.forgotUsername,
+  usernameError: state.login.usernameError,
   error: state.login.error,
   isForgot: state.login.isForgot,
 });

@@ -94,7 +94,7 @@ class LoginScreen extends Component<LoginScreenPropType, LoginScreenStateType> {
     if (this.props.isRegistering) return <RegisterPage />;
     if (this.props.isForgot) return <ForgotPage />;
     // The user is null, so they're logged out
-    return <RootActivity />;
+    return <LoginPage />;
     // register={this.props.isRegistred}
   }
 }

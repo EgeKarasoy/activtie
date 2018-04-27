@@ -3,7 +3,6 @@
 import React, { Component } from 'react';
 import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
-import Dimensions from 'Dimensions';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
   Animated,
   Image,
   View,
+  Dimensions,
 } from 'react-native';
 import { connect } from 'react-redux';
 import Expo from 'expo';
@@ -18,7 +18,7 @@ import firebase from 'firebase';
 import type { StateType } from '../../../Redux/index';
 import LoginActions from '../../../Redux/LoginRedux';
 import spinner from '../images/loading.gif';
-import RootContainer from '../../RootContainer';
+import RootActivity from '../../RootActivity';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
@@ -84,7 +84,15 @@ type ButtonSubmitPropType = {
   facebookPress: Function,
   googlePress: Function,
   value: ?string,
-  valueChange: Function
+  valueChange: Function,
+  usernameError: ?string,
+  usernameErrorChange: Function,
+  passwordError: ?string,
+  passwordErrorChange: Function,
+  loginUsername: ?string,
+  loginPassword: ?string,
+  userIdChange: Function,
+  loginSuccess: Function
   // facebookData: ?string
 };
 
@@ -146,6 +154,55 @@ export class ButtonSubmit extends Component<
   //   const responseJSON = JSON.stringify(await response.json());
   //   this.setState({ responseJSON });
   // };
+
+  onPressButton= () => {
+    const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(this.props.loginUsername) === false) {
+      const usernameError2 = this.props.usernameErrorChange;
+      usernameError2('Gecerli bir email girin..');
+    }
+    else if (this.props.loginPassword.length < 6) {
+      const usernameError3 = this.props.usernameErrorChange;
+      usernameError3('');
+      const passwordError = this.props.passwordErrorChange;
+      passwordError('Gecerli bir sifre girin, Minimum 5 Karakter');
+    } 
+    else {
+      const passwordError2 = this.props.passwordErrorChange;
+      passwordError2('');
+      this.buttonPress();
+    }
+  };
+
+  buttonPress= () => {
+    fetch('http://activtie.com/api/login', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_e_mail: this.props.loginUsername,
+        user_password: this.props.loginPassword,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const userKeeper = this.props.userIdChange;
+        userKeeper(responseJson.user_id);
+        const loginDone = this.props.loginSuccess;
+        loginDone(responseJson.user_id);
+
+        // dispatch(LoginActions.registerComplated());
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  };
+
   loginWithFacebook = async (): Promise< void > => {
     const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync(
       '559657841057861',
@@ -176,35 +233,35 @@ export class ButtonSubmit extends Component<
     }
   };
 
-  loginWithGoogle = async (): Promise< void > => {
-    try {
-      const result = await Expo.Google.logInAsync({
-        androidClientId: '446874486201-bjfsdpk3d5sj0ugb3he4vpb30mdvr6pb.apps.googleusercontent.com',
-        iosClientId: '446874486201-rhcsvvlmfgfepqvb9rhbdrtcbmriqlgb.apps.googleusercontent.com',
-        scopes: ['profile', 'email'],
-      });
-      console.log('RESULT: ', result);
-      console.log('RESULT_ACCESS: ', result.accessToken);
+  // loginWithGoogle = async (): Promise< void > => {
+  //   try {
+  //     const result = await Expo.Google.logInAsync({
+  //       androidClientId: '446874486201-bjfsdpk3d5sj0ugb3he4vpb30mdvr6pb.apps.googleusercontent.com',
+  //       iosClientId: '446874486201-rhcsvvlmfgfepqvb9rhbdrtcbmriqlgb.apps.googleusercontent.com',
+  //       scopes: ['profile', 'email'],
+  //     });
+  //     console.log('RESULT: ', result);
+  //     console.log('RESULT_ACCESS: ', result.accessToken);
 
-      if (result.type === 'success') {
-        try {
-          const credential = await firebase.auth.GoogleAuthProvider.credential(result.idToken, result.accessToken);
-          console.log('CREDENTIAL', credential);
-          await firebase
-            .auth()
-            .signInWithCredential(credential)
-            .then((user: User) => {
-              const google = this.props.googlePress;
-              google();
-            });
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     if (result.type === 'success') {
+  //       try {
+  //         const credential = await firebase.auth.GoogleAuthProvider.credential(result.idToken, result.accessToken);
+  //         console.log('CREDENTIAL', credential);
+  //         await firebase
+  //           .auth()
+  //           .signInWithCredential(credential)
+  //           .then((user: User) => {
+  //             const google = this.props.googlePress;
+  //             google();
+  //           });
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // renderFacebook = (): ?React$Element< * > => { return (
   //     <View>
@@ -233,29 +290,29 @@ export class ButtonSubmit extends Component<
     //   inputRange: [0, 1],
     //   outputRange: [1, MARGIN],
     // });
-    if (this.props.user) return <RootContainer />;
+    if (this.props.user) return <RootActivity />;
 
     return (
       <View style={styles.container}>
         <Animated.View
           style={{
             width: 150,
-            flex: 1,
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}
         >
           <TouchableOpacity
             style={styles.button}
-            onPress={this.props.buttonPress}
+            onPress={this.onPressButton}
             activeOpacity={1}
           >
             {this.state.isLoading ? (
               <Image source={spinner} style={styles.image} />
             ) : (
-              <Text style={styles.text}>LOGIN</Text>
+              <Text style={styles.text}>GIRIS YAP</Text>
             )}
           </TouchableOpacity>
+          <Text style={{ color: 'red', fontWeight: 'bold' }}>{this.props.nameError}</Text>
           <TouchableOpacity
             style={styles.facebookButton}
             onPress={this.loginWithFacebook}
@@ -264,10 +321,10 @@ export class ButtonSubmit extends Component<
             {this.state.isLoading ? (
               <Image source={spinner} style={styles.image} />
             ) : (
-              <Text style={styles.text}>Login With Facebook</Text>
+              <Text style={styles.text}>Facebook ile Gir</Text>
             )}
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.googleButton}
             onPress={this.loginWithGoogle}
             activeOpacity={1}
@@ -277,16 +334,22 @@ export class ButtonSubmit extends Component<
             ) : (
               <Text style={styles.text}>Login With Google</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           {/* <Animated.View style={{ width: 5 }} /> */}
         </Animated.View>
+        <Text style={{ color: 'red', fontWeight: 'bold' }}>{this.props.usernameError}{this.props.passwordError}</Text>
       </View>
     );
   }
 }
 
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
-  buttonPress: (): void => dispatch(LoginActions.loginRequest()),
+  usernameErrorChange: (value: Object) => {
+    dispatch(LoginActions.usernameErrorChange(value));
+  },
+  passwordErrorChange: (value: Object) => {
+    dispatch(LoginActions.passwordErrorChange(value));
+  },
   facebookPress: () => {
     firebase.auth().onAuthStateChanged((user: Object) => {
       dispatch(LoginActions.loginSuccess(user));
@@ -295,17 +358,22 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   valueChange: (value: Object) => {
     dispatch(LoginActions.facebookLoginSuccess(value));
   },
-  googlePress: () => {
-    firebase.auth().onAuthStateChanged((user: Object) => {
-      dispatch(LoginActions.loginSuccess(user));
-    });
+  userIdChange: (value: Object) => {
+    dispatch(LoginActions.userIdChange(value));
+  },
+  loginSuccess: (user: Object) => {
+    dispatch(LoginActions.loginSuccess(user));
   },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
-  username: state.login.username,
-  password: state.login.password,
+  loginUsername: state.login.loginUsername,
+  loginPassword: state.login.loginPassword,
   user: state.login.user,
+  usernameError: state.login.usernameError,
+  passwordError: state.login.passwordError,
+  nameError: state.login.nameError,
+  userId: state.login.userId,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ButtonSubmit);

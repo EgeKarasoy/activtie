@@ -22,10 +22,10 @@ import passwordImg from '../images/password.png';
 // import eyeImg from '../images/eye_black.png';
 
 type LoginFormPropType = {
-  username: ?string,
-  usernameChange: Function,
-  password: ?string,
-  passwordChange: Function,
+  loginUsername: ?string,
+  loginUsernameChange: Function,
+  loginPassword: ?string,
+  loginPasswordChange: Function,
   error: ?string
 };
 
@@ -77,8 +77,8 @@ export class Form extends Component<LoginFormPropType> {
           autoCapitalize="none"
           returnKeyType="done"
           autoCorrect={false}
-          onChangeText={this.props.usernameChange}
-          value={this.props.username}
+          onChangeText={this.props.loginUsernameChange}
+          value={this.props.loginUsername}
         />
         <UserInput
           source={passwordImg}
@@ -87,8 +87,8 @@ export class Form extends Component<LoginFormPropType> {
           returnKeyType="done"
           autoCapitalize="none"
           autoCorrect={false}
-          onChangeText={this.props.passwordChange}
-          value={this.props.password}
+          onChangeText={this.props.loginPasswordChange}
+          value={this.props.loginPassword}
         />
         {/* <TouchableOpacity
           activeOpacity={0.7}
@@ -107,19 +107,19 @@ const DEVICE_WIDTH = Dimensions.get('window').width;
 const DEVICE_HEIGHT = Dimensions.get('window').height;
 
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
-  usernameChange: (text: ?string) => {
+  loginUsernameChange: (text: ?string) => {
     console.log(text);
-    dispatch(LoginActionCreators.usernameChange(text));
+    dispatch(LoginActionCreators.loginUsernameChange(text));
   },
-  passwordChange: (text: ?string) => {
+  loginPasswordChange: (text: ?string) => {
     console.log(text);
-    dispatch(LoginActionCreators.passwordChange(text));
+    dispatch(LoginActionCreators.loginPasswordChange(text));
   },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
-  username: state.login.username,
-  password: state.login.password,
+  loginUsername: state.login.loginUsername,
+  loginPassword: state.login.loginPassword,
   error: state.login.error,
 });
 
