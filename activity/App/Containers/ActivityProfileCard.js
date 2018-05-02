@@ -28,9 +28,11 @@ import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
 import type { StateType } from '../Redux/index';
 import ActivityActionCreators from '../Redux/ActivityRedux';
+import ProfileActionCreators from '../Redux/ProfileRedux';
 import ActivitySendMessageProfile from './ActivitySendMessageProfile';
 import ActivityProfileCardInfo from './ActivityProfileCardInfo';
 import ActivityJoin from './ActivityJoin';
+import ActivityDetail from './ActivityDetail';
 
 const styles = StyleSheet.create({
   cardContainer: {
@@ -137,10 +139,6 @@ class ActivityProfileCard extends Component<ActivityProfileCardPropType> {
         { key: '2', title: 'Bilgiler', icon: 'info' },
       ],
     },
-  }
-
-  onPressPlace = () => {
-    console.log('place')
   }
 
   componentDidMount() {
@@ -283,6 +281,7 @@ class ActivityProfileCard extends Component<ActivityProfileCardPropType> {
 
   render(): React$Element< * > {
     if (this.props.isGoActivityProfileCard === false) return <ActivityJoin />;
+    if (this.props.isGoActivityDetailProfileCard === false) return <ActivityDetail />;
     return (
       <View style={[styles.container, this.props.containerStyle]}>
         <Header>
@@ -311,6 +310,7 @@ class ActivityProfileCard extends Component<ActivityProfileCardPropType> {
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   goActivityProfileCardCompletedButton: () => {
     dispatch(ActivityActionCreators.goActivityProfileCardCompleted());
+    dispatch(ProfileActionCreators.goActivityDetailProfileCardCompleted());
   },
   getActivityProfileCardData: (value: Object) => {
     dispatch(ActivityActionCreators.getActivityProfileCardData(value));
@@ -322,6 +322,7 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   isGoActivityProfileCard: state.activity.isGoActivityProfileCard,
   creatorId: state.activity.creatorId,
   activityProfileCardData: state.activity.activityProfileCardData,
+  isGoActivityDetailProfileCard: state.profile.isGoActivityDetailProfileCard,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityProfileCard);

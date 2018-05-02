@@ -28,6 +28,7 @@ export const reduxSagaFirebase = new ReduxSagaFirebase(myFirebaseApp);
 
 export default class App extends React.Component<*> {
   componentWillMount() {
+    console.disableYellowBox = true;
     // Initialize Firebase
   }
 

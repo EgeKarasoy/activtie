@@ -266,14 +266,9 @@ class ActivityMain extends Component<ActivityMainPropType> {
                   </CardItem>
                   <CardItem cardBody>
                     <Image
-                      source={{ uri: `data:image/jpg;base64,${item.activity_picture}` }}
+                      source={{ uri: `http://activtie.com/${item.activity_picture}` }}
                       style={{ height: 200, width: null, flex: 1 }}
-                    >
-                      <Image
-                        source={{ uri: `${item.activity_picture}` }}
-                        style={{ height: 200, width: null, flex: 1 }}
-                      />
-                    </Image>
+                    />
                   </CardItem>
                   <Button full warning onPress={(): void => this.props.goActivityJoinButton(item.activity_id)}>
                     <Text> INCELE ! </Text>

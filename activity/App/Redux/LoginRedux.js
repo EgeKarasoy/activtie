@@ -11,6 +11,7 @@ const { Types, Creators } = createActions({
   loginSuccess: ['user'],
   loginFailure: ['error'],
   logout: null,
+  userReset: null,
   usernameChange: ['username'],
   nameChange: ['name'],
   surnameChange: ['surname'],
@@ -89,6 +90,9 @@ export const request = (state: LoginStateType): LoginStateType =>
 // we've successfully logged in
 const success = (state: LoginStateType, { user }: Object): LoginStateType =>
   Object.assign({}, state, { fetching: false, error: '', user });
+
+const userReset = (state: LoginStateType): LoginStateType =>
+  Object.assign({}, state, { user: null, userId: null });
 
 // we've had a problem logging in
 const failure = (state: LoginStateType, { error }: Object): LoginStateType =>
@@ -203,6 +207,7 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.LOGIN_USERNAME_CHANGE]: loginUsernameChange,
   [Types.LOGIN_PASSWORD_CHANGE]: loginPasswordChange,
   [Types.FORGOT_USERNAME_CHANGE]: forgotUsernameChange,
+  [Types.USER_RESET]: userReset,
   // [Types.REGISTER_REQUEST]: registerRequest,
 });
 

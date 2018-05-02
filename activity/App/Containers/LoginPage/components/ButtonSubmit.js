@@ -11,6 +11,7 @@ import {
   Image,
   View,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { connect } from 'react-redux';
 import Expo from 'expo';
@@ -161,11 +162,11 @@ export class ButtonSubmit extends Component<
       const usernameError2 = this.props.usernameErrorChange;
       usernameError2('Gecerli bir email girin..');
     }
-    else if (this.props.loginPassword.length < 6) {
+    else if (this.props.loginPassword.length < 7) {
       const usernameError3 = this.props.usernameErrorChange;
       usernameError3('');
       const passwordError = this.props.passwordErrorChange;
-      passwordError('Gecerli bir sifre girin, Minimum 5 Karakter');
+      passwordError('Gecerli bir sifre girin, Minimum 6 Karakter');
     } 
     else {
       const passwordError2 = this.props.passwordErrorChange;
@@ -290,7 +291,17 @@ export class ButtonSubmit extends Component<
     //   inputRange: [0, 1],
     //   outputRange: [1, MARGIN],
     // });
-    if (this.props.user) return <RootActivity />;
+    // if (this.props.user === -1) {
+    //   Alert.alert(
+    //     'Oopps',
+    //     'Kullanıcı Adı veya Şifre Yanlış !',
+    //     [
+    //       { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+    //     ],
+    //     { cancelable: false },
+    //   )
+    // }
+    // if ((this.props.user !== -1) && (this.props.user !== null)) return <RootActivity />;
 
     return (
       <View style={styles.container}>

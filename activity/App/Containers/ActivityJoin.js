@@ -19,7 +19,7 @@ import {
 } from 'native-base';
 import type { StateType } from '../Redux/index';
 import ActivityActionCreators from '../Redux/ActivityRedux';
-// import ProfileActionCreators from '../Redux/ProfileRedux';
+import ProfileActionCreators from '../Redux/ProfileRedux';
 import ActivityMain from './ActivityMain';
 import ActivityProfileCard from './ActivityProfileCard';
 
@@ -133,9 +133,7 @@ class ActivityJoin extends Component<ActivityJoinPropType> {
                   <CardItem>
                     <Left>
                       <Thumbnail
-                        source={{
-                          uri: `data:image/jpg;base64,${item.user_picture}`,
-                        }}
+                        source={{ uri: `http://activtie.com/${item.user_picture}` }}
                       />
                       <Body>
                         <Text>{`${item.activity_name}`}</Text>
@@ -181,7 +179,7 @@ class ActivityJoin extends Component<ActivityJoinPropType> {
                   <CardItem cardBody>
                     <Image
                       source={{
-                        uri: `data:image/jpg;base64,${item.activity_picture}`,
+                        uri: `http://activtie.com/${item.activity_picture}`,
                       }}
                       style={{ height: 200, width: null, flex: 1 }}
                     >
@@ -243,6 +241,7 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   },
   goActivityProfileCardButton: (value: Object) => {
     dispatch(ActivityActionCreators.goActivityProfileCard(value));
+    dispatch(ProfileActionCreators.goActivityDetailProfileCard(value));
   },
   getActivityJoinData: (value: Object) => {
     dispatch(ActivityActionCreators.getActivityJoinData(value));

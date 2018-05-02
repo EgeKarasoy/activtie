@@ -9,6 +9,8 @@ import {
   StyleSheet,
   Text,
   View,
+  FlatList,
+  Linking,
 } from 'react-native'
 import { Icon } from 'react-native-elements'
 import {
@@ -17,12 +19,18 @@ import {
   TabViewPagerScroll,
   TabViewPagerPan,
 } from 'react-native-tab-view'
-import { Button } from 'native-base'
-import PropTypes from 'prop-types'
+import { Button, CardItem } from 'native-base'
+import { connect } from 'react-redux';
+import type { Dispatch as ReduxDispatch } from 'redux';
+import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
+import type { StateType } from '../../Redux/index';
+import ProfileActionCreators from '../../Redux/ProfileRedux';
+// import PropTypes from 'prop-types'
 import Information from './Information'
 import MyActivities from './MyActivities'
 import Messages from './Messages'
 import Notifications from './Notifications'
+import ActivityDetail from '../ActivityDetail'
 
 const styles = StyleSheet.create({
   cardContainer: {
@@ -103,31 +111,15 @@ const styles = StyleSheet.create({
   },
 })
 
-export default class Profile extends Component<*> {
-  static propTypes = {
-    avatar: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    bio: PropTypes.string.isRequired,
-    containerStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number]),
-    tabContainerStyle: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.number,
-    ]),
-    posts: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      words: PropTypes.string.isRequired,
-      sentence: PropTypes.string.isRequired,
-      paragraph: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      user: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-        avatar: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-      }),
-    })).isRequired,
-  }
+type ProfilePropType = {
+  userId: ?string,
+  profileData: Array< mixed >,
+  getProfileData: Function,
+  goUpdateProfile: boolean,
+  updateProfileChangeCompleted: Function
+};
 
+class Profile extends Component<ProfilePropType> {
   static defaultProps = {
     containerStyle: {},
     tabContainerStyle: {},
@@ -145,9 +137,30 @@ export default class Profile extends Component<*> {
     },
   }
 
-  onPressPlace = () => {
-    console.log('place')
+  componentDidMount() {
+    const goProfile = this.getProfileData;
+    goProfile();
+    const completedInfo = this.props.updateProfileChangeCompleted;
+    completedInfo();
+    // console.disableYellowBox = true;
   }
+
+  getProfileData = (): void =>
+    fetch(
+      `http://activtie.com/api/profile/{"visitor_id":${
+        this.props.userId
+      },"visited_id":${this.props.userId}}`,
+      { method: 'GET' },
+    )
+      .then((response: any): any => response.json())
+      .then((responseJson: any) => {
+        const profileSend = this.props.getProfileData;
+        profileSend(responseJson);
+        // dispatch(ActivityActionCreators.getLatestActivityData(responseJson));
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
 
   handleIndexChange = (index: any) => {
     this.setState({
@@ -208,62 +221,64 @@ export default class Profile extends Component<*> {
   ))
 
   renderContactHeader = (): React$Element< * > => {
-    const { avatar, name, bio } = this.props
+    // const { avatar, name, bio } = this.props
     return (
-      <View style={styles.headerContainer}>
-        <View style={styles.userRow}>
-          <Image
-            style={styles.userImage}
-            source={{
-              uri: avatar,
-            }}
-          />
-          <View style={styles.userNameRow}>
-            <Text style={styles.userNameText}>{name}</Text>
-          </View>
-          <View style={styles.userBioRow}>
-            <Text style={styles.userBioText}>{bio}</Text>
-          </View>
-        </View>
-        <View style={styles.socialRow}>
-          <View>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#3B5A98"
-              name="facebook-with-circle"
-              onPress={(): void => console.log('facebook')}
-            />
-          </View>
-          <View style={styles.socialIcon}>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#56ACEE"
-              name="twitter-with-circle"
-              onPress={(): void => console.log('twitter')}
-            />
-          </View>
-          <View>
-            <Icon
-              size={30}
-              type="entypo"
-              color="#DD4C39"
-              name="instagram-with-circle"
-              onPress={(): void => console.log('instagram')}
-            />
-          </View>
-        </View>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Button style={{ width: 100 }} block danger rounded small>
-            <Text style={{ fontWeight: 'bold' }}>LOGOUT</Text>
-          </Button>
-        </View>
-      </View>
+      <CardItem>
+        <FlatList
+          data={this.props.profileData}
+          keyExtractor={(x: any, i: any): any => i}
+          renderItem={({ item }: any): React$Element< * > => (
+            <View style={styles.headerContainer}>
+              <View style={styles.userRow}>
+                <Image
+                  style={styles.userImage}
+                  source={{ uri: `http://activtie.com/${item.user_picture}` }}
+                />
+                <View style={styles.userNameRow}>
+                  <Text style={styles.userNameText}>{` ${item.user_name}`}{` ${item.user_surname}`}</Text>
+                </View>
+                <View style={styles.userBioRow}>
+                  <Text style={styles.userBioText}>{` ${item.user_info}`}</Text>
+                </View>
+              </View>
+              <View style={styles.socialRow}>
+                <View>
+                  <Icon
+                    size={30}
+                    type="entypo"
+                    color="#3B5A98"
+                    name="facebook-with-circle"
+                    onPress={(): void => Linking.openURL(`http://facebook.com/${item.user_facebook}`)}
+                  />
+                </View>
+                <View style={styles.socialIcon}>
+                  <Icon
+                    size={30}
+                    type="entypo"
+                    color="#56ACEE"
+                    name="twitter-with-circle"
+                    onPress={(): void => Linking.openURL(`http://twitter.com/${item.user_twitter}`)}
+                  />
+                </View>
+                <View>
+                  <Icon
+                    size={30}
+                    type="entypo"
+                    color="#DD4C39"
+                    name="instagram-with-circle"
+                    onPress={(): void => Linking.openURL(`http://instagram.com/${item.user_instagram}`)}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+        />
+      </CardItem>
     )
   }
 
   render(): React$Element< * > {
+    if (this.props.isGoActivityDetail) return <ActivityDetail />;
     return (
       <ScrollView style={styles.scroll}>
         <View style={[styles.container, this.props.containerStyle]}>
@@ -283,3 +298,21 @@ export default class Profile extends Component<*> {
     )
   }
 }
+
+const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
+  getProfileData: (value: Object) => {
+    dispatch(ProfileActionCreators.getProfileData(value));
+  },
+  updateProfileChangeCompleted: () => {
+    dispatch(ProfileActionCreators.updateProfileChangeCompleted());
+  },
+});
+
+const mapStateToProps = (state: StateType): MapStateToProps => ({
+  userId: state.login.userId,
+  profileData: state.profile.profileData,
+  isGoActivityDetail: state.profile.isGoActivityDetail,
+  goUpdateProfile: state.profile.goUpdateProfile,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);

@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import { Alert } from 'react-native';
 // import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import type { Dispatch as ReduxDispatch } from 'redux';
@@ -11,7 +12,7 @@ import type { User } from 'firebase';
 
 import LoginActionCreators from '../Redux/LoginRedux';
 import type { StateType } from '../Redux/index';
-import RootContainer from './RootContainer';
+// import RootContainer from './RootContainer';
 import LoginPage from './LoginPage/components/Main';
 import RegisterPage from './LoginPage/components/RegisterPage';
 import ForgotPage from './LoginPage/components/ForgotPage';
@@ -20,7 +21,7 @@ import RootActivity from './RootActivity';
 type LoginScreenPropType = {
   user: ?string,
   loading: ?boolean,
-  addLoginListener: Function
+  userReset: Function
 };
 
 type LoginScreenStateType = {
@@ -85,12 +86,30 @@ class LoginScreen extends Component<LoginScreenPropType, LoginScreenStateType> {
   //     alert('Logged in!', `Hi ${(await response.json()).name}!`);
   //   }
   // };
+  // componentWillMount() {
+  //   const userConvertNull = this.props.userReset;
+  //   userConvertNull();
+  //   // console.disableYellowBox = true;
+  // }
 
   render(): ?React$Element< * > {
     // The application is initialising
     if (this.props.loading) return null;
     // The user is an Object, so they're logged in
-    if (this.props.user) return <RootActivity />;
+    if (this.props.user === -1) {
+      Alert.alert(
+        'Oopps',
+        'Kullanıcı Adı veya Şifre Yanlış !',
+        [{ text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') }],
+        { cancelable: false },
+      );
+      const userConvertNull = this.props.userReset;
+      userConvertNull();
+      console.disableYellowBox = true;
+    }
+    if (this.props.user !== -1 && this.props.user !== null) {
+      return <RootActivity />;
+    }
     if (this.props.isRegistering) return <RegisterPage />;
     if (this.props.isForgot) return <ForgotPage />;
     // The user is null, so they're logged out
@@ -111,10 +130,8 @@ class LoginScreen extends Component<LoginScreenPropType, LoginScreenStateType> {
 
 // wraps dispatch to create nicer functions to call within our component
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
-  addLoginListener: () => {
-    firebase.auth().onAuthStateChanged((user: Object) => {
-      dispatch(LoginActionCreators.loginSuccess(user));
-    });
+  userReset: () => {
+    dispatch(LoginActionCreators.userReset());
   },
 });
 

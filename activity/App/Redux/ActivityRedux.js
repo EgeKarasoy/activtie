@@ -14,10 +14,14 @@ const { Types, Creators } = createActions({
   goActivityProfileCardCompleted: null,
   loading: null,
   loadingCompleted: null,
-  activityNameChange: ['activityName'],
-  activityDescriptionChange: ['activityDescription'],
-  categoryPickerValueChange: ['categoryPickerValue'],
-  userNumberChange: ['userNumber'],
+  activityCreateNameChange: ['activityCreateName'],
+  activityCreateDescriptionChange: ['activityDescription'],
+  activityCreateCategoryPickerValueChange: ['activityCreateCategoryPickerValue'],
+  activityCreateUserNumberChange: ['activityCreateUserNumber'],
+  activityCreateCityNameChange: ['activityCreateCityName'],
+  activityCreateDateChange: ['activityCreateDate'],
+  activityCreateTimeChange: ['activityCreateTime'],
+  activityCreateErrorChange: ['activityCreateError'],
   getCityData: ['cityData'],
   getLatestActivityData: ['latestActivityData'],
   getActivityJoinData: ['activityJoinData'],
@@ -26,6 +30,7 @@ const { Types, Creators } = createActions({
   getActivityProfileCardData: ['activityProfileCardData'],
   activityMessageChange: ['activityMessage'],
   activityMessageErrorChange: ['activityMessageError'],
+  getCategoryData: ['categoryData'],
 });
 
 export const ActivityTypes = Types;
@@ -38,10 +43,14 @@ export type ActivityStateType = {
   isGoActivityJoin: boolean,
   isLoading: boolean,
   isGoActivityProfileCard: boolean,
-  activityName: ?string,
-  activityDescription: ?string,
-  categoryPickerValue: ?string,
-  userNumber: ?number,
+  activityCreateName: ?string,
+  activityCreateDescription: ?string,
+  activityCreateCategoryPickerValue: ?string,
+  activityCreateUserNumber: ?string,
+  activityCreateCityName: ?string,
+  activityCreateDate: ?string,
+  activityCreateTime: ?string,
+  activityCreateError: ?string,
   cityData: Array< mixed >,
   latestActivityData: Array< mixed >,
   activityId: ?string,
@@ -51,7 +60,8 @@ export type ActivityStateType = {
   creatorId: ?string,
   activityProfileCardData: Array< mixed >,
   activityMessage: ?string,
-  activityMessageError: ?string
+  activityMessageError: ?string,
+  categoryData: Array< mixed >
 };
 
 export const INITIAL_STATE: ActivityStateType = ({
@@ -59,10 +69,14 @@ export const INITIAL_STATE: ActivityStateType = ({
   isGoActivityJoin: false,
   isLoading: true,
   isGoActivityProfileCard: false,
-  activityName: '',
-  activityDescription: '',
-  categoryPickerValue: '',
-  userNumber: 2,
+  activityCreateName: '',
+  activityCreateDescription: '',
+  activityCreateCategoryPickerValue: '',
+  activityCreateUserNumber: '',
+  activityCreateCityName: '',
+  activityCreateDate: '',
+  activityCreateTime: '',
+  activityCreateError: '',
   cityData: [],
   latestActivityData: [],
   activityId: '',
@@ -73,6 +87,7 @@ export const INITIAL_STATE: ActivityStateType = ({
   activityProfileCardData: [],
   activityMessage: '',
   activityMessageError: '',
+  categoryData: [],
 }: ActivityStateType);
 
 /* ------------- Reducers ------------- */
@@ -89,25 +104,45 @@ const loading = (state: ActivityStateType): ActivityStateType =>
 const loadingCompleted = (state: ActivityStateType): ActivityStateType =>
   Object.assign({}, state, { isLoading: false });
 
-const activityNameChange = (
+const activityCreateNameChange = (
   state: ActivityStateType,
-  { activityName }: Object,
-): ActivityStateType => Object.assign({}, state, { activityName });
+  { activityCreateName }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateName });
 
-const activityDescriptionChange = (
+const activityCreateDescriptionChange = (
   state: ActivityStateType,
-  { activityDescription }: Object,
-): ActivityStateType => Object.assign({}, state, { activityDescription });
+  { activityCreateDescription }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateDescription });
 
-const categoryPickerValueChange = (
+const activityCreateCategoryPickerValueChange = (
   state: ActivityStateType,
-  { categoryPickerValue }: Object,
-): ActivityStateType => Object.assign({}, state, { categoryPickerValue });
+  { activityCreateCategoryPickerValue }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateCategoryPickerValue });
 
-const userNumberChange = (
+const activityCreateUserNumberChange = (
   state: ActivityStateType,
-  { userNumber }: Object,
-): ActivityStateType => Object.assign({}, state, { userNumber });
+  { activityCreateUserNumber }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateUserNumber });
+
+const activityCreateCityNameChange = (
+  state: ActivityStateType,
+  { activityCreateCityName }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateCityName });
+
+const activityCreateDateChange = (
+  state: ActivityStateType,
+  { activityCreateDate }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateDate });
+
+const activityCreateTimeChange = (
+  state: ActivityStateType,
+  { activityCreateTime }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateTime });
+
+const activityCreateErrorChange = (
+  state: ActivityStateType,
+  { activityCreateError }: Object,
+): ActivityStateType => Object.assign({}, state, { activityCreateError });
 
 const getCityData = (
   state: ActivityStateType,
@@ -149,6 +184,11 @@ const activityMessageErrorChange = (
   { activityMessageError }: Object,
 ): ActivityStateType => Object.assign({}, state, { activityMessageError });
 
+const getCategoryData = (
+  state: ActivityStateType,
+  { categoryData }: Object,
+): ActivityStateType => Object.assign({}, state, { categoryData });
+
 const goActivityJoin = (
   state: ActivityStateType,
   { activityId }: Object,
@@ -180,10 +220,14 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.GO_ALL_CITIES_COMPLETED]: goAllCitiesCompleted,
   [Types.LOADING]: loading,
   [Types.LOADING_COMPLETED]: loadingCompleted,
-  [Types.ACTIVITY_NAME_CHANGE]: activityNameChange,
-  [Types.ACTIVITY_DESCRIPTION_CHANGE]: activityDescriptionChange,
-  [Types.CATEGORY_PICKER_VALUE_CHANGE]: categoryPickerValueChange,
-  [Types.USER_NUMBER_CHANGE]: userNumberChange,
+  [Types.ACTIVITY_CREATE_NAME_CHANGE]: activityCreateNameChange,
+  [Types.ACTIVITY_CREATE_DESCRIPTION_CHANGE]: activityCreateDescriptionChange,
+  [Types.ACTIVITY_CREATE_CATEGORY_PICKER_VALUE_CHANGE]: activityCreateCategoryPickerValueChange,
+  [Types.ACTIVITY_CREATE_USER_NUMBER_CHANGE]: activityCreateUserNumberChange,
+  [Types.ACTIVITY_CREATE_CITY_NAME_CHANGE]: activityCreateCityNameChange,
+  [Types.ACTIVITY_CREATE_DATE_CHANGE]: activityCreateDateChange,
+  [Types.ACTIVITY_CREATE_TIME_CHANGE]: activityCreateTimeChange,
+  [Types.ACTIVITY_CREATE_ERROR_CHANGE]: activityCreateErrorChange,
   [Types.GET_CITY_DATA]: getCityData,
   [Types.GET_LATEST_ACTIVITY_DATA]: getLatestActivityData,
   [Types.GET_ACTIVITY_JOIN_DATA]: getActivityJoinData,
@@ -196,6 +240,7 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.ACTIVITY_MESSAGE_CHANGE]: activityMessageChange,
   [Types.ACTIVITY_MESSAGE_ERROR_CHANGE]: activityMessageErrorChange,
   [Types.ACTIVITY_MESSAGE_REQUEST_KEEPER]: activityMessageRequestKeeper,
+  [Types.GET_CATEGORY_DATA]: getCategoryData,
 });
 
 /* ------------- Selectors ------------- */
