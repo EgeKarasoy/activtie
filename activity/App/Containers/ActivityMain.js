@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   FlatList,
+  Alert,
 } from 'react-native';
 import { Content, Button, Left, Right, CardItem, Thumbnail, Body, Icon, Card } from 'native-base';
 import Slideshow from 'react-native-slideshow';
@@ -23,6 +24,7 @@ import ActivityHeader from './ActivityHeader';
 import IndexCard from './Profile/IndexCard';
 import AllCities from './AllCities'
 import ActivityJoin from './ActivityJoin'
+import ActivitySearchDetail from './ActivitySearchDetail'
 
 const styles = StyleSheet.create({
   header: {
@@ -70,7 +72,16 @@ type ActivityMainPropType = {
   goAllCitiesButton: Function,
   getLatestActivityData: Function,
   latestActivityData: Array< mixed >,
-  goActivityJoinButton: Function
+  goActivityJoinButton: Function,
+  goActivityMainCheckCompleted: Function,
+  activitySearchCategoryNamePickerValue: ?string,
+  activitySearchCityName: ?string,
+  activitySearchCategoryNamePickerValueChange: Function,
+  getSearchData: Function,
+  goActivitySearchDetailCheck: Function,
+  activitySearchCityNameChange: Function,
+  activitySearchCategoryTypePickerValue: ?string,
+  activitySearchName: ?string
 };
 
 class ActivityMain extends Component<ActivityMainPropType> {
@@ -91,19 +102,22 @@ class ActivityMain extends Component<ActivityMainPropType> {
       interval: null,
       dataSource: [
         {
-          title: 'Kordonda midye-bira',
-          caption: 'Izmir',
-          url: 'http://placeimg.com/640/480/any',
-        },
-        {
-          title: 'Gece Yanlayalim',
+          activity_id: 11,
+          title: 'Latin Dans Etkinligi',
           caption: 'Istanbul',
-          url: 'http://placeimg.com/640/480/any',
+          url: 'http://www.istanbuldansakademi.com/wp-content/uploads/2015/12/tango-768x461.jpg',
         },
         {
-          title: 'Anitkabire Yuruyus',
+          activity_id: 10,
+          title: 'Bostanlida Kahve',
+          caption: 'Izmir',
+          url: 'https://iasbh.tmgrup.com.tr/8a416c/752/395/0/163/800/583?u=https://isbh.tmgrup.com.tr/sbh/2018/05/01/turk-kahvesinin-faydalari-nelerdir-turk-kahvesi-nasil-yapilir-1525160577297.jpg',
+        },
+        {
+          activity_id: 15,
+          title: 'Bilkent Mayfest Etkinligi',
           caption: 'Ankara',
-          url: 'http://placeimg.com/640/480/any',
+          url: 'http://radyobilkent.com/wp-content/uploads/2018/05/Ekran-Resmi-2018-05-04-09.47.41-1100x512.png',
         },
       ],
     };
@@ -125,6 +139,8 @@ class ActivityMain extends Component<ActivityMainPropType> {
   componentDidMount() {
     const latestActivities = this.props.getLatestActivityData
     latestActivities();
+    const goMainCompleted = this.props.goActivityMainCheckCompleted
+    goMainCompleted();
     // console.disableYellowBox = true;
   }
 
@@ -140,10 +156,515 @@ class ActivityMain extends Component<ActivityMainPropType> {
     // alert(`icon ${item.index}`);
   }
 
+  postActivityIzmirSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: this.props.activitySearchCategoryNamePickerValue,
+        city_name: 'İzmir',
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityAnkaraSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: this.props.activitySearchCategoryNamePickerValue,
+        city_name: 'Ankara',
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityIstanbulSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: this.props.activitySearchCategoryNamePickerValue,
+        city_name: 'İstanbul',
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityBasketbolSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Basketbol',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityFutbolSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Futbol',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivitySinemaSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Sinema',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityPartiSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Parti',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityKonserSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Konser',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityMangalSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Mangal',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityPiknikSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Piknik',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityGeziSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Gezi',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityBulusmaSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Buluşma',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityYemekSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Yemek',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
+  postActivityTenisSearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: 'Tenis',
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
   render(): React$Element< * > {
     if (this.props.isGoProfileCard) return <IndexCard />;
     if (this.props.isGoAllCities) return <AllCities />;
     if (this.props.isGoActivityJoin) return <ActivityJoin />;
+    if (this.props.goActivitySearchDetail === true) return <ActivitySearchDetail />;
     return (
       <Content>
         <ActivityHeader />
@@ -152,12 +673,17 @@ class ActivityMain extends Component<ActivityMainPropType> {
           dataSource={this.state.dataSource}
           position={this.state.position}
           onPositionChanged={position => this.setState({ position })}
-          onPress={null}
+          onPress={(): void => this.props.goActivityJoinButton('15')}
+          // onPress={(): any => 
+          //   { this.state.dataSource.map((item: any): any => 
+          //     this.props.goActivityJoinButton(item.activity_id))
+          //   }
+          // }
         />
         <View>
           <View style={styles.sectionStyles}>
-            <Text style={{ fontWeight: 'bold' }}>    Kategoriler</Text>
-            <Category
+            <Text style={{ fontWeight: 'bold' }}>   Kategoriler</Text>
+            {/* <Category
               style={{ backgroundColor: 'white' }}
               imageData={this.arrImage2}
               iconSet="Ionicons"
@@ -170,7 +696,190 @@ class ActivityMain extends Component<ActivityMainPropType> {
               colorItemDefault="gray"
               colorItemSelected="#FF4E50"
               itemSelected={item => this.itemIconChoose(item)}
-            />
+            /> */}
+            <View style={styles.itemContainer}>
+              <ScrollView
+                horizontal
+                contentContainerStyle={{ justifyContent: 'space-around' }}
+              >
+                <Image
+                  source={{ uri: 'https://www.7arti3.com/wp-content/uploads/2017/10/basketbolun-genc-yetenekleri-375x276.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityBasketbolSearch}>
+                      <Text style={{ color: 'white' }}>Basketbol</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://liter.kz/public/uploads/36506-6-beznadezhnyi_uzbekista_ru.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityFutbolSearch}>
+                      <Text style={{ color: 'white' }}>Futbol</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'http://i2.haber7.net//haber/haber7/photos/2018/12/umed_sinema_akademisi_istanbulda_basliyor_1521533574_4033.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivitySinemaSearch}>
+                      <Text style={{ color: 'white' }}>Sinema</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://blogmedia.evbstatic.com/wp-content/uploads/bloguk/shutterstock_199419065-730x487.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityPartiSearch}>
+                      <Text style={{ color: 'white' }}>Parti</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'http://www.ekonomist.com.tr/wp-content/uploads/2017/05/1200023.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityKonserSearch}>
+                      <Text style={{ color: 'white' }}>Konser</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'http://cinyus.com/wp-content/uploads/2015/12/mangal-yapmak.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityMangalSearch}>
+                      <Text style={{ color: 'white' }}>Mangal</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://harbiyiyorum.com/wp-content/uploads/piknik-alanlari.png' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityPiknikSearch}>
+                      <Text style={{ color: 'white' }}>Piknik</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://www.sportscorptravel.com/wp-content/uploads/bb-plugin/cache/iStock_000062411790_Large-1024x670-panorama.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityGeziSearch}>
+                      <Text style={{ color: 'white' }}>Gezi</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://www.eharmony.co.uk/dating-advice/wp-content/uploads/2013/03/coping-with-shared-friends.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityBulusmaSearch}>
+                      <Text style={{ color: 'white' }}>Buluşma</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'http://i.hurimg.com/i/hurriyet/75/750x422/5aa25dc867b0a9137c080c74.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityTenisSearch}>
+                      <Text style={{ color: 'white' }}>Tenis</Text>
+                    </Button>
+                  </View>
+                </Image>
+                <Image
+                  source={{ uri: 'https://cdn.yemek.com/mncrop/940/625/uploads/2016/05/ev-yapimi-hamburger.jpg' }}
+                  style={{ height: 125, width: 75 }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      alignItems: 'flex-end',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button small full dark onPress={this.postActivityYemekSearch}>
+                      <Text style={{ color: 'white' }}>Yemek</Text>
+                    </Button>
+                  </View>
+                </Image>
+              </ScrollView>
+            </View>
           </View>
           <CardItem>
             <Left>
@@ -198,7 +907,7 @@ class ActivityMain extends Component<ActivityMainPropType> {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button small full dark>
+                <Button small full dark onPress={this.postActivityIzmirSearch}>
                   <Text style={{ color: 'white' }}>Izmir</Text>
                 </Button>
               </View>
@@ -214,7 +923,7 @@ class ActivityMain extends Component<ActivityMainPropType> {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button small full dark>
+                <Button small full dark onPress={this.postActivityIstanbulSearch}>
                   <Text style={{ color: 'white' }}>Istanbul</Text>
                 </Button>
               </View>
@@ -230,7 +939,7 @@ class ActivityMain extends Component<ActivityMainPropType> {
                   justifyContent: 'flex-end',
                 }}
               >
-                <Button small full dark>
+                <Button small full dark onPress={this.postActivityAnkaraSearch}>
                   <Text style={{ color: 'white' }}>Ankara</Text>
                 </Button>
               </View>
@@ -316,8 +1025,24 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   goAllCitiesButton: () => {
     dispatch(ActivityActionCreators.goAllCities());
   },
+  goActivityMainCheckCompleted: () => {
+    dispatch(ActivityActionCreators.goActivityMainCheckCompleted());
+  },
   goActivityJoinButton: (value: Object) => {
     dispatch(ActivityActionCreators.goActivityJoin(value));
+  },
+  activitySearchCategoryNamePickerValueChange: (value: Object) => {
+    dispatch(ActivityActionCreators.activitySearchCategoryNamePickerValueChange(value));
+  },
+  getSearchData: (value: Object) => {
+    dispatch(ActivityActionCreators.getSearchData(value));
+  },
+  goActivitySearchDetailCheck: () => {
+    dispatch(ActivityActionCreators.goActivitySearchDetailCheck());
+  },
+  activitySearchCityNameChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchCityNameChange(value));
   },
   getLatestActivityData: () => {
     // dispatch started fetch action
@@ -338,6 +1063,11 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   isGoActivityJoin: state.activity.isGoActivityJoin,
   latestActivityData: state.activity.latestActivityData,
   activityId: state.activity.activityId,
+  activitySearchCategoryNamePickerValue: state.activity.activitySearchCategoryNamePickerValue,
+  activitySearchCityName: state.activity.activitySearchCityName,
+  goActivitySearchDetail: state.activity.goActivitySearchDetail,
+  activitySearchName: state.activity.activitySearchName,
+  activitySearchCategoryTypePickerValue: state.activity.activitySearchCategoryTypePickerValue,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityMain);

@@ -25,6 +25,7 @@ import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
 import type { StateType } from '../../Redux/index';
 import ProfileActionCreators from '../../Redux/ProfileRedux';
+import LoginActionCreators from '../../Redux/LoginRedux';
 // import PropTypes from 'prop-types'
 import Information from './Information'
 import MyActivities from './MyActivities'
@@ -116,7 +117,9 @@ type ProfilePropType = {
   profileData: Array< mixed >,
   getProfileData: Function,
   goUpdateProfile: boolean,
-  updateProfileChangeCompleted: Function
+  updateProfileChangeCompleted: Function,
+  logout: Function,
+  picture: ?string
 };
 
 class Profile extends Component<ProfilePropType> {
@@ -231,9 +234,19 @@ class Profile extends Component<ProfilePropType> {
             <View style={styles.headerContainer}>
               <View style={styles.userRow}>
                 <Image
+                  source={require('../LoginPage/images/no_avatar.jpg')}
                   style={styles.userImage}
-                  source={{ uri: `http://activtie.com/${item.user_picture}` }}
-                />
+                >
+                  <Image
+                    style={styles.userImage}
+                    source={{ uri: `${this.props.picture}` }}
+                  >
+                    <Image
+                      style={styles.userImage}
+                      source={{ uri: `http://activtie.com/${item.user_picture}` }}
+                    />
+                  </Image>
+                </Image>
                 <View style={styles.userNameRow}>
                   <Text style={styles.userNameText}>{` ${item.user_name}`}{` ${item.user_surname}`}</Text>
                 </View>
@@ -270,6 +283,11 @@ class Profile extends Component<ProfilePropType> {
                   />
                 </View>
               </View>
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Button style={{ width: 100 }} block danger rounded small onPress={this.props.logout}>
+                  <Text style={{ fontWeight: 'bold' }}>LOGOUT</Text>
+                </Button>
+              </View>
             </View>
           )}
         />
@@ -279,6 +297,7 @@ class Profile extends Component<ProfilePropType> {
 
   render(): React$Element< * > {
     if (this.props.isGoActivityDetail) return <ActivityDetail />;
+    // if (this.props.userId === null) return <
     return (
       <ScrollView style={styles.scroll}>
         <View style={[styles.container, this.props.containerStyle]}>
@@ -306,6 +325,9 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   updateProfileChangeCompleted: () => {
     dispatch(ProfileActionCreators.updateProfileChangeCompleted());
   },
+  logout: () => {
+    dispatch(LoginActionCreators.logout());
+  },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
@@ -313,6 +335,7 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   profileData: state.profile.profileData,
   isGoActivityDetail: state.profile.isGoActivityDetail,
   goUpdateProfile: state.profile.goUpdateProfile,
+  picture: state.login.picture,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

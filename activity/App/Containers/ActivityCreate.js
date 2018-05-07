@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { Text, Image } from 'react-native';
+import { Text, Image, Alert } from 'react-native';
 import {
   ActionsContainer,
   Button,
@@ -24,32 +24,7 @@ import ActivityActionCreators from '../Redux/ActivityRedux';
 // import { Text } from 'react-native';
 // import { Content } from 'native-base';
 import ActivityHeader from './ActivityHeader';
-
-const cityOptions = [
-  { label: 'Izmir', value: 'Izmir' },
-  { label: 'Istanbul', value: 'Istanbul' },
-  { label: 'Ankara', value: 'Ankara' },
-];
-
-const categoryOptions = [
-  { label: 'Spor', value: 'Spor' },
-  { label: 'Yeme-İçme', value: 'Yemek' },
-  { label: 'Gezi', value: 'Gezi' },
-  { label: 'Alışveriş', value: 'Alisveris' },
-  { label: 'Organizasyon', value: 'Organizasyon' },
-  { label: 'Seyahat', value: 'Seyahat' },
-];
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#D9D9D9',
-//   },
-
-//   picker: {
-//     backgroundColor: '#E5E5E5',
-//   },
-// });
+import ActivityMain from './ActivityMain';
 
 type ActivityCreatePropType = {
   activityCreateName: ?string,
@@ -60,7 +35,7 @@ type ActivityCreatePropType = {
   activityCreateUserNumberChange: Function,
   activityCreateDate: ?string,
   activityCreateDateChange: Function,
-  createActivityButton: Function,
+  // createActivityButton: Function,
   activityCreateTime: ?string,
   activityCreateTimeChange: Function,
   activityCreateCategoryPickerValue: ?string,
@@ -70,7 +45,16 @@ type ActivityCreatePropType = {
   getCityData: Function,
   cityData: Array< mixed >,
   getCategoryData: Function,
-  categoryData: Array< mixed >
+  categoryData: Array< mixed >,
+  activityCreateLatitudeSender: Function,
+  activityCreateLongitudeSender: Function,
+  activityCreateLatitude: ?string,
+  activityCreateLongitude: ?string,
+  userId: ?string,
+  goActivityMainCheck: Function,
+  goActivityMain: boolean,
+  activityCreateErrorChange: Function,
+  activityCreateError: ?string
 };
 
 class ActivityCreate extends Component<ActivityCreatePropType> {
@@ -81,6 +65,60 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
     categories();
     // console.disableYellowBox = true;
   }
+
+  onPressButtonCreate= () => {
+    if (this.props.activityCreateName.length < 4) {
+      const error1 = this.props.activityCreateErrorChange;
+      error1('Aktivite adinizi en az 3 karakter girin..');
+    }
+    else if (this.props.activityCreateDescription.length < 4) {
+      const error2 = this.props.activityCreateErrorChange;
+      error2('');
+      const error3 = this.props.activityCreateErrorChange;
+      error3('Aktivite aciklamanizi en az 3 karakter girin..');
+    } 
+    else if (this.props.activityCreateCategoryPickerValue.length < 1) {
+      const error4 = this.props.activityCreateErrorChange;
+      error4('');
+      const error5 = this.props.activityCreateErrorChange;
+      error5('Aktivite kategorinizi secin..');
+    } 
+    else if (this.props.activityCreateUserNumber.length < 1) {
+      const error6 = this.props.activityCreateErrorChange;
+      error6('');
+      const error7 = this.props.activityCreateErrorChange;
+      error7('Kisi sayisi girin..');
+    } 
+    else if (this.props.activityCreateCityName.length < 1) {
+      const error8 = this.props.activityCreateErrorChange;
+      error8('');
+      const error9 = this.props.activityCreateErrorChange;
+      error9('Aktivite sehrinizi secin..');
+    }
+    else if (this.props.activityCreateDate.length < 1) {
+      const error10 = this.props.activityCreateErrorChange;
+      error10('');
+      const error11 = this.props.activityCreateErrorChange;
+      error11('Aktivite tarihinizi secin..');
+    } 
+    else if (this.props.activityCreateTime.length < 1) {
+      const error12 = this.props.activityCreateErrorChange;
+      error12('');
+      const error13 = this.props.activityCreateErrorChange;
+      error13('Aktivite saatinizi secin..');
+    } 
+    else if ((this.props.activityCreateLatitude.length < 1) && (this.props.activityCreateLongitude.length < 1)) {
+      const error14 = this.props.activityCreateErrorChange;
+      error14('');
+      const error15 = this.props.activityCreateErrorChange;
+      error15('Aktivite konumunuzu belirleyin..');
+    } 
+    else {
+      const errorReset = this.props.activityCreateErrorChange;
+      errorReset('');
+      this.postActivityCreate();
+    }
+  };
 
   getActivityCities = (): void =>
     fetch('http://activtie.com/api/all_cities', { method: 'GET' })
@@ -104,7 +142,66 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
         console.error(error);
       });
 
+  postActivityCreate= () => {
+    fetch('http://activtie.com/api/create_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activityCreateName,
+        activity_time: `${this.props.activityCreateDate} ${this.props.activityCreateTime}`,
+        activity_location: `${this.props.activityCreateLatitude}-${this.props.activityCreateLongitude}`,
+        activity_user_number: this.props.activityCreateUserNumber,
+        activity_info: this.props.activityCreateDescription,
+        city_name: this.props.activityCreateCityName,
+        category_name: this.props.activityCreateCategoryPickerValue,
+        activity_picture: null,
+        creator_id: this.props.userId,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        console.log(responseJson[0].result);
+        if (responseJson[0].result === 'true') {
+          Alert.alert(
+            'SUPERRR',
+            'Aktivite Kaydi Basarili!',
+            [
+              {
+                text: 'Tamam',
+                onPress: (): void => console.log('Tamama Basıldı'),
+              },
+            ],
+            { cancelable: false },
+          );
+          const goMain = this.props.goActivityMainCheck;
+          goMain();
+        } else {
+          Alert.alert(
+            'Oopps',
+            'Aktiviteni Kaydedemedik, Tekrar Dene !',
+            [
+              {
+                text: 'Tamam',
+                onPress: (): void => console.log('Tamama Basıldı'),
+              },
+            ],
+            { cancelable: false },
+          );
+        }
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+  };
+
   render(): React$Element< * > {
+    if (this.props.goActivityMain === true) return <ActivityMain />;
     return (
       <Form>
         <ActivityHeader />
@@ -207,7 +304,8 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
                 style={{ width: 200 }}
                 date={this.props.activityCreateTime}
                 mode="time"
-                format="HH:mm"
+                placeholder="Saat sec"
+                format="HH:mm:ss"
                 confirmBtnText="Confirm"
                 cancelBtnText="Cancel"
                 is24Hour
@@ -238,7 +336,15 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
               fetchDetails
               renderDescription={(row: any): any => row.description} // custom description render
               onPress={(data: any, details: any = null) => { // 'details' is provided when fetchDetails = true
-                console.log(data, details);
+                const latitude = details.geometry.location.lat;
+                console.log('latitude: ', latitude);
+                const latPoster = this.props.activityCreateLatitudeSender;
+                latPoster(latitude);
+
+                const longitude = details.geometry.location.lng;
+                console.log('longitude: ', longitude);
+                const longPoster = this.props.activityCreateLongitudeSender;
+                longPoster(longitude);
               }}
 
               getDefaultValue={(): void => ''}
@@ -286,10 +392,11 @@ class ActivityCreate extends Component<ActivityCreatePropType> {
           <Button
             icon="md-checkmark"
             iconPlacement="right"
-            onPress={this.props.createActivityButton}
+            onPress={this.onPressButtonCreate}
           >
             Aktiviteni Yarat
           </Button>
+          <Text style={{ color: 'red', fontWeight: 'bold' }}>{this.props.activityCreateError}</Text>
         </ActionsContainer>
       </Form>
     );
@@ -333,6 +440,21 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
     console.log(value);
     dispatch(ActivityActionCreators.getCategoryData(value));
   },
+  activityCreateLatitudeSender: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activityCreateLatitudeSender(value));
+  },
+  activityCreateLongitudeSender: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activityCreateLongitudeSender(value));
+  },
+  goActivityMainCheck: () => {
+    dispatch(ActivityActionCreators.goActivityMainCheck());
+  },
+  activityCreateErrorChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activityCreateErrorChange(value));
+  },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
@@ -345,6 +467,11 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   activityCreateTime: state.activity.activityCreateTime,
   cityData: state.activity.cityData,
   categoryData: state.activity.categoryData,
+  activityCreateLatitude: state.activity.activityCreateLatitude,
+  activityCreateLongitude: state.activity.activityCreateLongitude,
+  userId: state.login.userId,
+  goActivityMain: state.activity.goActivityMain,
+  activityCreateError: state.activity.activityCreateError,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityCreate);

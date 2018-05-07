@@ -28,7 +28,7 @@ const MARGIN = 40;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    top: -180,
+    top: -140,
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -93,7 +93,20 @@ type ButtonSubmitPropType = {
   loginUsername: ?string,
   loginPassword: ?string,
   userIdChange: Function,
-  loginSuccess: Function
+  loginSuccess: Function,
+  username: ?string,
+  usernameChange: Function,
+  password: ?string,
+  passwordChange: Function,
+  name: ?string,
+  nameChange: Function,
+  surname: ?string,
+  surnameChange: Function,
+  loginUsernameChange: Function,
+  loginUsername: ?string,
+  loginPasswordChange: Function,
+  loginPassword: ?string,
+  pictureChange: Function
   // facebookData: ?string
 };
 
@@ -212,11 +225,37 @@ export class ButtonSubmit extends Component<
       },
     );
     if (type === 'success') {
-      const response = await fetch(`https://graph.facebook.com/me?access_token=${token}&fields=id,name,email,about,picture?width=250&height=250`);
+      const response = await fetch(`https://graph.facebook.com/me?access_token=${token}&fields=id,first_name,last_name,email,about,picture.type(large)`);
       console.log('RESPONSE : ', response);
       const json = await response.json();
       this.props.valueChange(json);
       console.log('USER_INFO : ', json);
+
+      const faceMail = `${json.id}@facebook.com`;
+      console.log('FACE MAIL: ', faceMail);
+      const postFaceEMail = this.props.usernameChange;
+      postFaceEMail(faceMail);
+
+      const faceName = json.first_name;
+      console.log('FACE NAME: ', faceName);
+      const postFaceName = this.props.nameChange;
+      postFaceName(faceName);
+
+      const faceLastName = json.last_name;
+      console.log('FACE SURNAME: ', faceLastName);
+      const postFaceSurname = this.props.surnameChange;
+      postFaceSurname(faceLastName);
+
+      const facePassword = json.id;
+      console.log('FACE PASSWORD: ', facePassword);
+      const postFacePassword = this.props.passwordChange;
+      postFacePassword(facePassword);
+
+      const facePicture = json.picture.data.url;
+      console.log('FACE PICTURE: ', facePicture);
+      const postFacePicture = this.props.pictureChange;
+      postFacePicture(facePicture);
+
 
       try {
         const credential = await firebase.auth.FacebookAuthProvider.credential(token);
@@ -225,13 +264,49 @@ export class ButtonSubmit extends Component<
           .auth()
           .signInWithCredential(credential)
           .then((user: User) => {
-            const facebook = this.props.facebookPress;
+            const facebook = this.postRegister;
             facebook();
           });
       } catch (error) {
         console.log.error(error);
       }
     }
+  };
+
+  postRegister= () => {
+    fetch('http://activtie.com/api/registration', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_name: this.props.name,
+        user_surname: this.props.surname,
+        user_e_mail: this.props.username,
+        user_password: this.props.password,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const faceLoginId = this.props.username;
+        const postFaceId = this.props.loginUsernameChange;
+        postFaceId(faceLoginId);
+  
+        const faceLoginPassword = this.props.password;
+        const postFaceLoginPassword = this.props.loginPasswordChange;
+        postFaceLoginPassword(faceLoginPassword);
+
+        const logFacebook = this.buttonPress;
+        logFacebook();
+        // dispatch(LoginActions.registerComplated());
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
   };
 
   // loginWithGoogle = async (): Promise< void > => {
@@ -375,6 +450,34 @@ const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   loginSuccess: (user: Object) => {
     dispatch(LoginActions.loginSuccess(user));
   },
+  nameChange: (name: ?string) => {
+    console.log(name);
+    dispatch(LoginActions.nameChange(name));
+  },
+  surnameChange: (surname: ?string) => {
+    console.log(surname);
+    dispatch(LoginActions.surnameChange(surname));
+  },
+  usernameChange: (text: ?string) => {
+    console.log(text);
+    dispatch(LoginActions.usernameChange(text));
+  },
+  passwordChange: (text: ?string) => {
+    console.log(text);
+    dispatch(LoginActions.passwordChange(text));
+  },
+  loginUsernameChange: (text: ?string) => {
+    console.log(text);
+    dispatch(LoginActions.loginUsernameChange(text));
+  },
+  loginPasswordChange: (text: ?string) => {
+    console.log(text);
+    dispatch(LoginActions.loginPasswordChange(text));
+  },
+  pictureChange: (text: ?string) => {
+    console.log(text);
+    dispatch(LoginActions.pictureChange(text));
+  },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
@@ -385,6 +488,10 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   passwordError: state.login.passwordError,
   nameError: state.login.nameError,
   userId: state.login.userId,
+  username: state.login.username,
+  password: state.login.password,
+  name: state.login.name,
+  surname: state.login.surname,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ButtonSubmit);

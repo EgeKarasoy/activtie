@@ -26,7 +26,7 @@ export default class RegisterLogo extends Component<*> {
   render(): React$Element< * > {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>CREATE ACCOUNT</Text>
+        <Text style={styles.text}>KAYIT OL</Text>
       </View>
     );
   }

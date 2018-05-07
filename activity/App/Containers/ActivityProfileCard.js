@@ -122,7 +122,8 @@ type ActivityProfileCardPropType = {
   containerStyle: any,
   tabContainerStyle: any,
   activityProfileCardData: Array< mixed >,
-  activityPicture: ?string
+  activityPicture: ?string,
+  picture: ?string
 };
 
 class ActivityProfileCard extends Component<ActivityProfileCardPropType> {
@@ -233,9 +234,19 @@ class ActivityProfileCard extends Component<ActivityProfileCardPropType> {
             <View style={styles.headerContainer}>
               <View style={styles.userRow}>
                 <Image
+                  source={require('./LoginPage/images/no_avatar.jpg')}
                   style={styles.userImage}
-                  source={{ uri: `http://activtie.com/${item.user_picture}` }}
-                />
+                >
+                  <Image
+                    style={styles.userImage}
+                    source={{ uri: `${this.props.picture}` }}
+                  >
+                    <Image
+                      style={styles.userImage}
+                      source={{ uri: `http://activtie.com/${item.user_picture}` }}
+                    />
+                  </Image>
+                </Image>
                 <View style={styles.userNameRow}>
                   <Text style={styles.userNameText}>{` ${item.user_name}`}{` ${item.user_surname}`}</Text>
                 </View>
@@ -323,6 +334,7 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   creatorId: state.activity.creatorId,
   activityProfileCardData: state.activity.activityProfileCardData,
   isGoActivityDetailProfileCard: state.profile.isGoActivityDetailProfileCard,
+  picture: state.login.picture,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityProfileCard);

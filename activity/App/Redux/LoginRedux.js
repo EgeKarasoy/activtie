@@ -30,6 +30,7 @@ const { Types, Creators } = createActions({
   loginUsernameChange: ['loginUsername'],
   loginPasswordChange: ['loginPassword'],
   forgotUsernameChange: ['forgotUsername'],
+  pictureChange: ['picture'],
 });
 
 export const LoginTypes = Types;
@@ -56,7 +57,8 @@ export type LoginStateType = {
   passwordError: ?string,
   loginUsername: ?string,
   loginPassword: ?string,
-  forgotUsername: ?string
+  forgotUsername: ?string,
+  picture: ?string
 };
 
 export const INITIAL_STATE: LoginStateType = Immutable(({
@@ -79,6 +81,7 @@ export const INITIAL_STATE: LoginStateType = Immutable(({
   loginUsername: '',
   loginPassword: '',
   forgotUsername: '',
+  picture: '',
 }: LoginStateType));
 
 /* ------------- Reducers ------------- */
@@ -137,6 +140,11 @@ const facebookLoginSuccess = (
   state: LoginStateType,
   { value }: Object,
 ): LoginStateType => Object.assign({}, state, { value });
+
+const pictureChange = (
+  state: LoginStateType,
+  { picture }: Object,
+): LoginStateType => Object.assign({}, state, { picture });
 
 const registerBegin = (state: LoginStateType): LoginStateType =>
   Object.assign({}, state, { isRegistering: true });
@@ -208,6 +216,7 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.LOGIN_PASSWORD_CHANGE]: loginPasswordChange,
   [Types.FORGOT_USERNAME_CHANGE]: forgotUsernameChange,
   [Types.USER_RESET]: userReset,
+  [Types.PICTURE_CHANGE]: pictureChange,
   // [Types.REGISTER_REQUEST]: registerRequest,
 });
 

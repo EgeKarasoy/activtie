@@ -25,7 +25,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(52, 52, 52, 0.6)',
+    fontWeight: 'bold',
   },
   button: {
     alignItems: 'center',
@@ -56,10 +57,10 @@ class SignupSection extends Component<SignupSectionPropType> {
     return (
       <View style={styles.container}>
         <TouchableOpacity onPress={this.props.registerBegin}>
-          <Text style={styles.text}>Create Account</Text>
+          <Text style={styles.text}>Kayıt Ol</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={this.props.forgotPasswordBegin}>
-          <Text style={styles.text}>Forgot Password?</Text>
+          <Text style={styles.text}>Şifremi Unuttum</Text>
         </TouchableOpacity>
       </View>
     );

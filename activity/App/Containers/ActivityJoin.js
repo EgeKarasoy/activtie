@@ -32,7 +32,8 @@ type ActivityJoinPropType = {
   goActivityRequestButton: Function,
   goActivityProfileCardButton: Function,
   joinRequestKeeper: Function,
-  joinRequest: ?string
+  joinRequest: ?string,
+  picture: ?string
 };
 
 class ActivityJoin extends Component<ActivityJoinPropType> {
@@ -133,8 +134,16 @@ class ActivityJoin extends Component<ActivityJoinPropType> {
                   <CardItem>
                     <Left>
                       <Thumbnail
-                        source={{ uri: `http://activtie.com/${item.user_picture}` }}
-                      />
+                        source={require('./LoginPage/images/no_avatar.jpg')}
+                      >
+                        <Thumbnail
+                          source={{ uri: `${this.props.picture}` }}
+                        >
+                          <Thumbnail
+                            source={{ uri: `http://activtie.com/${item.user_picture}` }}
+                          />
+                        </Thumbnail>
+                      </Thumbnail>
                       <Body>
                         <Text>{`${item.activity_name}`}</Text>
                         {/* <Text note style={{ fontStyle: 'italic' }}>
@@ -191,7 +200,7 @@ class ActivityJoin extends Component<ActivityJoinPropType> {
                   </CardItem>
                   <Button
                     full
-                    warning
+                    success
                     onPress={this.postJoinRequest}
                   >
                     <Text> KATIL ! </Text>
@@ -256,6 +265,7 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   joinRequest: state.activity.joinRequest,
   isGoActivityProfileCard: state.activity.isGoActivityProfileCard,
   creatorId: state.activity.creatorId,
+  picture: state.login.picture,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivityJoin);

@@ -26,7 +26,7 @@ export default class ForgotLogo extends Component<*> {
   render(): React$Element< * > {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>FORGOT PASSWORD</Text>
+        <Text style={styles.text}>ŞİFREMİ UNUTTUM</Text>
       </View>
     );
   }

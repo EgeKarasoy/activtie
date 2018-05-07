@@ -1,8 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
-import Dimensions from 'Dimensions';
+import { StyleSheet, View, Text, Image, Dimensions } from 'react-native';
 import logoImg from '../images/activtie.jpeg';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
@@ -16,7 +15,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: DEVICE_WIDTH - 40,
-    height: 80,
+    height: 55,
   },
   text: {
     color: 'white',

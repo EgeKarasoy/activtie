@@ -24,6 +24,7 @@ import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
 import type { StateType } from '../Redux/index';
 import ActivityActionCreators from '../Redux/ActivityRedux';
 import ActivityMain from './ActivityMain';
+import ActivitySearchDetail from './ActivitySearchDetail';
 
 const styles = StyleSheet.create({
   container: {
@@ -36,7 +37,11 @@ const styles = StyleSheet.create({
 type AllCitiesPropType = {
   goAllCitiesCompletedButton: Function,
   getCityData: Function,
-  cityData: Array< mixed >
+  cityData: Array< mixed >,
+  activitySearchCityName: ?string,
+  activitySearchCityNameChange: Function,
+  getSearchData: Function,
+  goActivitySearchDetailCheck: Function
 };
 
 class AllCities extends Component<AllCitiesPropType> {
@@ -52,6 +57,47 @@ class AllCities extends Component<AllCitiesPropType> {
     cities();
     // console.disableYellowBox = true;
   }
+  onPressCitySearch= (text: ?string) => {
+    const messageError2 = this.props.activitySearchCityNameChange;
+    messageError2(text);
+    this.postActivitySearch();
+  };
+  postActivitySearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: null,
+        category_type: null,
+        category_name: null,
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
 
   // getData(): void {
   //   return fetch('https://univerlist.com/api/v1/province/', { method: 'GET' })
@@ -81,6 +127,7 @@ class AllCities extends Component<AllCitiesPropType> {
 
   render(): React$Element< * > {
     if (this.props.isGoAllCities === false) return <ActivityMain />;
+    if (this.props.goActivitySearchDetail === true) return <ActivitySearchDetail />;
     if (this.props.isLoading) {
       return (
         <View
@@ -117,7 +164,7 @@ class AllCities extends Component<AllCitiesPropType> {
                 }}
               >
                 <Image
-                  source={{ uri: `${item.city_picture}` }}
+                  source={{ uri: `http://activtie.com/${item.city_picture}` }}
                   style={{ height: 150, width: 100 }}
                 >
                   <View
@@ -127,7 +174,7 @@ class AllCities extends Component<AllCitiesPropType> {
                       justifyContent: 'flex-end',
                     }}
                   >
-                    <Button small full dark>
+                    <Button small full dark onPress={(): void => this.onPressCitySearch(item.city_name)}>
                       <Text style={{ color: 'white' }}>{`${item.city_name}`}</Text>
                     </Button>
                   </View>
@@ -144,6 +191,16 @@ class AllCities extends Component<AllCitiesPropType> {
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
   goAllCitiesCompletedButton: () => {
     dispatch(ActivityActionCreators.goAllCitiesCompleted());
+  },
+  activitySearchCityNameChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchCityNameChange(value));
+  },
+  goActivitySearchDetailCheck: () => {
+    dispatch(ActivityActionCreators.goActivitySearchDetailCheck());
+  },
+  getSearchData: (value: Object) => {
+    dispatch(ActivityActionCreators.getSearchData(value));
   },
   getCityData: () => {
     // dispatch started fetch action
@@ -163,6 +220,8 @@ const mapStateToProps = (state: StateType): MapStateToProps => ({
   isGoAllCities: state.activity.isGoAllCities,
   isLoading: state.activity.isLoading,
   cityData: state.activity.cityData,
+  activitySearchCityName: state.activity.activitySearchCityName,
+  goActivitySearchDetail: state.activity.goActivitySearchDetail,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AllCities);

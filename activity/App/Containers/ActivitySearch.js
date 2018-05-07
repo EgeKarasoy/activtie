@@ -1,186 +1,265 @@
 // @flow
 
 import React, { Component } from 'react';
-import { Text, Image } from 'react-native';
-// import SearchBar from 'react-native-searchbar';
-import { SearchBar } from 'react-native-elements';
+import { Text, Image, Alert } from 'react-native';
 import {
-  Container,
-  Content,
-  Card,
-  CardItem,
-  Body,
-  Left,
-  Right,
-  Thumbnail,
+  ActionsContainer,
   Button,
-  Icon,
-} from 'native-base';
+  FieldsContainer,
+  Fieldset,
+  Form,
+  FormGroup,
+  Input,
+  Label,
+} from 'react-native-clean-form';
+import { Picker, Icon } from 'native-base';
+import DatePicker from 'react-native-datepicker';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { connect } from 'react-redux';
 import type { Dispatch as ReduxDispatch } from 'redux';
 import type { MapStateToProps, MapDispatchToProps } from 'react-redux';
 import type { StateType } from '../Redux/index';
-import ProfileActionCreators from '../Redux/ProfileRedux';
+import ActivityActionCreators from '../Redux/ActivityRedux';
+// import TimePicker from 'react-native-timepicker';
+// import { Text } from 'react-native';
+// import { Content } from 'native-base';
 import ActivityHeader from './ActivityHeader';
-import IndexCard from './Profile/IndexCard';
-
-// const items = [
-//   1337,
-//   'halisaha1',
-//   'halisaha2',
-//   'basketbol',
-//   'yemek1',
-//   'yemek2',
-//   'yemek3',
-//   'doga yuruyusu',
-//   {
-//     lots: 'of',
-//     different: {
-//       types: 0,
-//       data: false,
-//       that: {
-//         can: {
-//           be: {
-//             quite: {
-//               complex: {
-//                 hidden: ['gold!'],
-//               },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   },
-//   [4, 2, 'tree'],
-// ];
+// import ActivityMain from './ActivityMain';
+import ActivitySearchDetail from './ActivitySearchDetail';
 
 type ActivitySearchPropType = {
-  goProfileCardButton: Function
+  activitySearchName: ?string,
+  activitySearchNameChange: Function,
+  activitySearchCategoryTypePickerValue: ?string,
+  activitySearchCategoryTypePickerValueChange: Function,
+  activitySearchCategoryNamePickerValue: ?string,
+  activitySearchCategoryNamePickerValueChange: Function,
+  activitySearchCityNameChange: Function,
+  activitySearchCityName: ?string,
+  getCityData: Function,
+  cityData: Array< mixed >,
+  getCategoryData: Function,
+  categoryData: Array< mixed >,
+  goActivitySearchDetailCheck: Function,
+  goActivitySearchDetail: boolean,
+  activitySearchErrorChange: Function,
+  activitySearchError: ?string,
+  getSearchData: Function
+  // searchData: Array< mixed >
 };
 
 class ActivitySearch extends Component<ActivitySearchPropType> {
-  // constructor(props: any) {
-  //   super(props);
-  //   this.state = {
-  //     items,
-  //     results: [],
-  //   };
-  //   this.handleResults = this.handleResults.bind(this);
-  // }
+  componentDidMount() {
+    const cities = this.getActivityCities
+    cities();
+    const categories = this.getActivityCategories
+    categories();
+    // console.disableYellowBox = true;
+  }
 
-  // handleResults(results: any) {
-  //   this.setState({ results });
-  // }
+  onPressButtonSearch= () => {
+    if ((this.props.activitySearchName.length < 1) &&
+    (this.props.activitySearchCategoryTypePickerValue.length < 1) &&
+      (this.props.activitySearchCategoryNamePickerValue.length < 1) &&
+        (this.props.activitySearchCityName.length < 1)) {
+      const error1 = this.props.activitySearchErrorChange;
+      error1('En az bir arama sonucu girin..');
+    }
+    else {
+      const errorReset = this.props.activitySearchErrorChange;
+      errorReset('');
+      this.postActivitySearch();
+    }
+  };
+
+  getActivityCities = (): void =>
+    fetch('http://activtie.com/api/all_cities', { method: 'GET' })
+      .then((response: any): any => response.json())
+      .then((responseJson: any) => {
+        const citySend = this.props.getCityData;
+        citySend(responseJson);
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+
+  getActivityCategories = (): void =>
+    fetch('http://activtie.com/api/all_categories', { method: 'GET' })
+      .then((response: any): any => response.json())
+      .then((responseJson: any) => {
+        const categorySend = this.props.getCategoryData;
+        categorySend(responseJson);
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+
+  postActivitySearch= () => {
+    fetch('http://activtie.com/api/search_activity', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_name: this.props.activitySearchName,
+        category_type: this.props.activitySearchCategoryTypePickerValue,
+        category_name: this.props.activitySearchCategoryNamePickerValue,
+        city_name: this.props.activitySearchCityName,
+        activity_time: null,
+      }),
+    })
+      .then((response: any): any => {
+        console.log(response);
+        return response.json();
+      })
+      .then((responseJson: any) => {
+        const sendSearchData = this.props.getSearchData;
+        sendSearchData(responseJson);
+        const goDetail = this.props.goActivitySearchDetailCheck;
+        goDetail();
+      })
+      .catch(() => {
+        Alert.alert(
+          'Üzgünüz!',
+          'Aradığın Aktivite Bulunamadı, İstersen Sen Yarat!',
+          [
+            { text: 'Tamam', onPress: (): void => console.log('Tamama Basıldı') },
+          ],
+          { cancelable: false },
+        )
+      });
+  };
 
   render(): React$Element< * > {
-    if (this.props.isGoProfileCard) return <IndexCard />;
-
+    if (this.props.goActivitySearchDetail === true) return <ActivitySearchDetail />;
     return (
-      // <View>
-      // <View style={{ marginTop: 110 }}>
-      //   {this.state.results.map((result, i) => (
-      //     <Text key={i}>
-      //       {typeof result === 'object' && !(result instanceof Array)
-      //         ? 'gold object!'
-      //         : result.toString()}
-      //     </Text>
-      //   ))}
-      // </View>
-      // <SearchBar
-      //   allDataOnEmptySearch
-      //   data={items}
-      //   handleResults={this._handleResults}
-      //   showOnLoad
-      //   hideBack
-      //   autoCorrect={false}
-      //   placeholder="Aktivite Ara.."
-      // />
-      // </View>
-      <Container>
+      <Form>
         <ActivityHeader />
-        {/* <View>
-          {this.state.results.map((result, i) => (
-            <Text key={i}>
-              {typeof result === 'object' && !(result instanceof Array)
-                ? 'gold object!'
-                : result.toString()}
-            </Text>
-          ))}
-        </View> */}
-        <SearchBar
-          round
-          allDataOnEmptySearch
-          lightTheme
-          onChangeText={null}
-          showOnLoad
-          hideBack
-          cancelButtonTitle="İptal"
-          autoCorrect={false}
-          placeholder="Aktivite Ara.."
-        />
-        <Content>
-          <Card>
-            <CardItem>
-              <Left>
-                <Thumbnail source={require('../Images/egekrsy.jpg')} />
-                <Body>
-                  <Text>Duman Bahar Konseri</Text>
-                  <Text note style={{ fontStyle: 'italic' }}>
-                    Beraber gidecegim arkadaş arıyorum
-                  </Text>
-                  <Button
-                    transparent
-                    dark
-                    onPress={this.props.goProfileCardButton}
-                  >
-                    <Text style={{ fontWeight: 'bold', color: 'blue' }}>
-                      Ege Karasoy
-                    </Text>
-                  </Button>
-                </Body>
-              </Left>
-            </CardItem>
-            <CardItem cardBody>
-              <Image
-                source={require('../Images/concert.jpg')}
-                style={{ height: 200, width: null, flex: 1 }}
+        <FieldsContainer>
+          <Fieldset label="Aktivite Arama">
+            <FormGroup>
+              <Label> Aktivite Adi ile Ara</Label>
+              <Input
+                placeholder="Doga Yuruyusu"
+                autoCorrect={false}
+                onChangeText={this.props.activitySearchNameChange}
+                value={this.props.activitySearchName}
+                maxLength={255}
               />
-            </CardItem>
-            <Button full warning>
-              <Text> KATIL !</Text>
-            </Button>
-            <CardItem>
-              <Left>
-                <Text>
-                  <Icon active name="pin" /> Izmir
-                </Text>
-              </Left>
-              <Body>
-                <Text>
-                  <Icon active name="people" /> 4 Kisi
-                </Text>
-              </Body>
-              <Right>
-                <Text>
-                  <Icon active name="time" /> 19:00
-                </Text>
-              </Right>
-            </CardItem>
-          </Card>
-        </Content>
-      </Container>
+            </FormGroup>
+            <FormGroup>
+              <Label> Kategorini Tipi ile Ara</Label>
+              <Picker
+                name="categories"
+                mode="dropdown"
+                placeHolder="Spor"
+                placeholderStyle={{ color: 'black' }}
+                iosHeader="Spor"
+                iosIcon={<Icon name="ios-arrow-down-outline" />}
+                onValueChange={this.props.activitySearchCategoryTypePickerValueChange}
+                selectedValue={this.props.activitySearchCategoryTypePickerValue}
+              >
+                { this.props.categoryData.map((item: any, key: any): any => (
+                  <Picker.Item label={item.category_type} value={item.category_type} key={key} />))}
+              </Picker>
+            </FormGroup>
+            <FormGroup>
+              <Label> Kategorini Adi ile Ara</Label>
+              <Picker
+                name="categories"
+                mode="dropdown"
+                placeHolder="Spor"
+                placeholderStyle={{ color: 'black' }}
+                iosHeader="Spor"
+                iosIcon={<Icon name="ios-arrow-down-outline" />}
+                onValueChange={this.props.activitySearchCategoryNamePickerValueChange}
+                selectedValue={this.props.activitySearchCategoryNamePickerValue}
+              >
+                { this.props.categoryData.map((item: any, key: any): any => (
+                  <Picker.Item label={item.category_name} value={item.category_name} key={key} />))}
+              </Picker>
+            </FormGroup>
+            <FormGroup>
+              <Label> Şehre Gore Ara</Label>
+              <Picker
+                name="cities"
+                mode="dropdown"
+                placeHolder="Izmir"
+                placeholderStyle={{ color: 'black' }}
+                iosHeader="Izmir"
+                iosIcon={<Icon name="ios-arrow-down-outline" />}
+                onValueChange={this.props.activitySearchCityNameChange}
+                selectedValue={this.props.activitySearchCityName}
+              >
+                { this.props.cityData.map((item: any, key: any): any => (
+                  <Picker.Item label={item.city_name} value={item.city_name} key={key} />))}
+              </Picker>
+            </FormGroup>
+          </Fieldset>
+        </FieldsContainer>
+        <ActionsContainer>
+          <Button
+            icon="md-checkmark"
+            iconPlacement="right"
+            onPress={this.onPressButtonSearch}
+          >
+            Aktiviteni Ara
+          </Button>
+          <Text style={{ color: 'red', fontWeight: 'bold' }}>{this.props.activitySearchError}</Text>
+        </ActionsContainer>
+      </Form>
     );
   }
 }
 
 const mapDispatchToProps = (dispatch: ReduxDispatch): MapDispatchToProps => ({
-  goProfileCardButton: () => {
-    dispatch(ProfileActionCreators.goProfileCard());
+  activitySearchNameChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchNameChange(value));
+  },
+  activitySearchCategoryTypePickerValueChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchCategoryTypePickerValueChange(value));
+  },
+  activitySearchCategoryNamePickerValueChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchCategoryNamePickerValueChange(value));
+  },
+  activitySearchCityNameChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchCityNameChange(value));
+  },
+  getCityData: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.getCityData(value));
+  },
+  getCategoryData: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.getCategoryData(value));
+  },
+  getSearchData: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.getSearchData(value));
+  },
+  activitySearchErrorChange: (value: ?Object) => {
+    console.log(value);
+    dispatch(ActivityActionCreators.activitySearchErrorChange(value));
+  },
+  goActivitySearchDetailCheck: () => {
+    dispatch(ActivityActionCreators.goActivitySearchDetailCheck());
   },
 });
 
 const mapStateToProps = (state: StateType): MapStateToProps => ({
-  isGoProfileCard: state.profile.isGoProfileCard,
+  activitySearchName: state.activity.activitySearchName,
+  activitySearchCategoryTypePickerValue: state.activity.activitySearchCategoryTypePickerValue,
+  activitySearchCategoryNamePickerValue: state.activity.activitySearchCategoryNamePickerValue,
+  activitySearchCityName: state.activity.activitySearchCityName,
+  cityData: state.activity.cityData,
+  categoryData: state.activity.categoryData,
+  activitySearchError: state.activity.activitySearchError,
+  goActivitySearchDetail: state.activity.goActivitySearchDetail,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActivitySearch);
